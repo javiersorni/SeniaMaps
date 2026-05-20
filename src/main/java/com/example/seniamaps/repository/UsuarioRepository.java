@@ -1,5 +1,6 @@
 package com.example.seniamaps.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface UsuarioRepository
 
     Optional<Usuario>
     findByEmail(String email);
+    
+    List<Usuario> findByRol(String rol);
 }
