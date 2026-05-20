@@ -1,22 +1,21 @@
 package com.example.seniamaps.services;
 
-import org.springframework.security.core.userdetails.*;
-import org.springframework.stereotype.Service;
-
 import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.repository.UsuarioRepository;
 
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserDetailsService
-        implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
 
-    public CustomUserDetailsService(
-            UsuarioRepository usuarioRepository) {
-
+    public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -24,16 +23,19 @@ public class CustomUserDetailsService
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        Usuario usuario =
-                usuarioRepository.findByUsername(username)
+        Usuario user = usuarioRepository.findByUsername(username)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "Usuario no encontrado"));
+                                "Usuario no encontrado: " + username
+                        )
+                );
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(usuario.getUsername())
-                .password(usuario.getPassword())
-                .authorities("USER")
+        return User.withUsername(user.getUsername())
+                .password(user.getPassword())
+
+                // 🔥 IMPORTANTE: Spring espera roles SIN "ROLE_"
+                .roles(user.getRol().replace("ROLE_", ""))
+
                 .build();
     }
 }
