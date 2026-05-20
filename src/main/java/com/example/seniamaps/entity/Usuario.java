@@ -30,6 +30,6 @@ public class Usuario {
 
     @Column(unique = true, nullable = false)
     private String username;
-
-    private String rol;
+    
+    private String rol="ROLE_USER";
 }
