@@ -3,25 +3,33 @@ package com.example.seniamaps.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.seniamaps.entity.Usuario;
+import com.example.seniamaps.repository.BusquedaRepository;
 import com.example.seniamaps.repository.UsuarioRepository;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final BusquedaRepository busquedaRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     public AdminController(
             UsuarioRepository usuarioRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            BusquedaRepository busquedaRepository
+
+    ) {
+
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.busquedaRepository = busquedaRepository;
     }
 
     /*
@@ -92,5 +100,15 @@ public class AdminController {
     @GetMapping("/dashboard")
     public String adminDashboard() {
         return "admin/dashboard";
+    }
+
+    @GetMapping("/users/history")
+    public String usersHistory(Model model) {
+
+        model.addAttribute(
+                "historial",
+                busquedaRepository.findAll());
+
+        return "admin/users-history";
     }
 }
