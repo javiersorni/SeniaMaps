@@ -1,7 +1,6 @@
 package com.example.seniamaps.services;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +15,6 @@ import com.example.seniamaps.dto.places.PlacePropertiesDTO;
 import com.example.seniamaps.entity.Resultado;
 import com.example.seniamaps.entity.ResultadoBusqueda;
 import com.example.seniamaps.repository.ResultadoRepository;
-
-
 
 @Service
 public class GeoapifyService {
@@ -42,19 +39,19 @@ public class GeoapifyService {
     public GeoapifyResponseDTO searchPlaces(
             double lat,
             double lon,
-            String keyword
-    ) {
+            String keyword,
+            int radius,
+            int limit
+        ) {
 
-        String encodedKeyword =
-                UriUtils.encode(keyword, StandardCharsets.UTF_8);
+        String encodedKeyword = UriUtils.encode(keyword, StandardCharsets.UTF_8);
 
-        String url =
-                "https://api.geoapify.com/v2/places"
-                        + "?categories=" + mapKeywordToCategory(keyword)
-                        + "&name=" + encodedKeyword
-                        + "&filter=circle:" + lon + "," + lat + ",3000"
-                        + "&limit=20"
-                        + "&apiKey=" + apiKey;
+        String url = "https://api.geoapify.com/v2/places"
+                + "?categories=" + mapKeywordToCategory(keyword)
+                + "&name=" + encodedKeyword
+                + "&filter=circle:" + lon + "," + lat + "," + radius
+                + "&limit="+limit
+                + "&apiKey=" + apiKey;
 
         System.out.println("🌍 GEOAPIFY URL: " + url);
 
@@ -71,8 +68,7 @@ public class GeoapifyService {
      */
 
     public GeoapifyResponseDTO buildResponseFromDatabase(
-            List<ResultadoBusqueda> relaciones
-    ) {
+            List<ResultadoBusqueda> relaciones) {
 
         GeoapifyResponseDTO response = new GeoapifyResponseDTO();
 
@@ -121,11 +117,11 @@ public class GeoapifyService {
             case "farmacia" -> "healthcare.pharmacy";
 
             case "mercadona",
-                 "consum",
-                 "aldi",
-                 "lidl",
-                 "carrefour" ->
-                    "commercial.supermarket";
+                    "consum",
+                    "aldi",
+                    "lidl",
+                    "carrefour" ->
+                "commercial.supermarket";
 
             default -> "commercial";
         };
@@ -137,30 +133,4 @@ public class GeoapifyService {
      * =====================================================
      */
 
-    public LocalDateTime getCacheTime(String keyword) {
-
-        keyword = keyword.toLowerCase();
-
-        return switch (keyword) {
-
-            case "pizza",
-                 "bar",
-                 "cafeteria",
-                 "cafe" ->
-                    LocalDateTime.now().minusHours(1);
-
-            case "mercadona",
-                 "consum",
-                 "aldi",
-                 "lidl",
-                 "carrefour" ->
-                    LocalDateTime.now().minusHours(24);
-
-            case "farmacia" ->
-                    LocalDateTime.now().minusHours(12);
-
-            default ->
-                    LocalDateTime.now().minusHours(2);
-        };
-    }
 }
