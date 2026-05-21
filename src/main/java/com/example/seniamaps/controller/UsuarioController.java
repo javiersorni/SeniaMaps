@@ -7,9 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -36,25 +33,5 @@ public class UsuarioController {
 
         return "personal"; // Devuelve templates/personal.html
     }
-    @GetMapping("/usuarios")
-    public String listarUsuarios(
-            @RequestParam(value = "rol", required = false) String rol, 
-            Model model) {
-        
-        List<Usuario> listaUsuarios;
 
-        // Imprime en la consola de Spring para ver si al pulsar las pestañas te llega el rol
-        System.out.println("El rol recibido por la URL es: " + rol);
-
-        if (rol != null && !rol.isEmpty() && !rol.equals("ALL")) {
-            listaUsuarios = usuarioRepository.findByRol(rol);
-        } else {
-            listaUsuarios = usuarioRepository.findAll();
-        }
-
-        model.addAttribute("usuarios", listaUsuarios);
-        model.addAttribute("rolSeleccionado", rol != null ? rol : "ALL");
-        
-        return "ListaUsuarios";
-    }
 }

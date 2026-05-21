@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Usuarios</title>
+    <title>Panel de Administración - Gestión de Usuarios</title>
     <style>
         :root {
             --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
             --background: #f8fafc;
             --surface: #ffffff;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --success: #166534;
+            --success-bg: #dcfce7;
+            --error: #991b1b;
+            --error-bg: #fee2e2;
+            --error-border: #fca5a5;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
         }
 
         body {
@@ -24,7 +32,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -66,11 +74,29 @@
             color: var(--text-main);
         }
 
-        /* Clase activa que Thymeleaf pintará según el rol de la URL */
         .tab-link.active {
             background-color: var(--surface);
             color: var(--primary-color);
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Alertas de Éxito / Error nativas de Spring */
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .alert-success {
+            background-color: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #bbf7d0;
+        }
+        .alert-error {
+            background-color: var(--error-bg);
+            color: var(--error);
+            border: 1px solid var(--error-border);
         }
 
         /* Tabla Estilizada */
@@ -92,7 +118,7 @@
             background-color: #f1f5f9;
             color: var(--text-muted);
             font-weight: 600;
-            padding: 16px 24px;
+            padding: 16px 20px;
             font-size: 0.75rem;
             letter-spacing: 0.05em;
             text-transform: uppercase;
@@ -100,8 +126,9 @@
         }
 
         td {
-            padding: 16px 24px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--border);
+            vertical-align: middle;
         }
 
         tr:last-child td {
@@ -123,21 +150,75 @@
         .badge-admin { background-color: #fee2e2; color: #991b1b; }
         .badge-user { background-color: #dcfce7; color: #166534; }
 
-        .password-hash {
-            font-family: monospace;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            max-width: 200px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; /* Corta el hash largo elegantemente */
-        }
-
         .no-results {
             text-align: center;
             padding: 40px;
             color: var(--text-muted);
             font-style: italic;
+        }
+
+        /* --- FORMULARIOS DE CONFIGURACIÓN --- */
+        .action-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .select-rol {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background-color: var(--surface);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .select-rol:focus, .input-password:focus {
+            border-color: var(--primary-color);
+        }
+
+        .input-password {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            width: 130px;
+            outline: none;
+        }
+
+        .btn-action {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* ¡NUEVO! Botón para eliminar */
+        .btn-delete {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:hover {
+            background-color: var(--danger-hover);
         }
     </style>
 </head>
@@ -145,49 +226,102 @@
 
 <div class="container">
     <div class="header-section">
-        <h1>Lista de Usuarios Registrados</h1>
+        <h1>Panel de Configuración de Usuarios</h1>
         
         <!-- Filtros mediante Enlaces de Navegación Puros -->
         <div class="filter-tabs">
-            <a th:href="@{/usuarios(rol='ALL')}" 
+            <a th:href="@{/admin/users(rol='ALL')}" 
                th:classappend="${rolSeleccionado == 'ALL' || rolSeleccionado == null} ? 'active' : ''" 
                class="tab-link">Todos</a>
                
-            <a th:href="@{/usuarios(rol='ROLE_USER')}" 
+            <a th:href="@{/admin/users(rol='ROLE_USER')}" 
                th:classappend="${rolSeleccionado == 'ROLE_USER'} ? 'active' : ''" 
                class="tab-link">Usuarios</a>
                
-            <a th:href="@{/usuarios(rol='ROLE_ADMIN')}" 
+            <a th:href="@{/admin/users(rol='ROLE_ADMIN')}" 
                th:classappend="${rolSeleccionado == 'ROLE_ADMIN'} ? 'active' : ''" 
                class="tab-link">Administradores</a>
         </div>
     </div>
 
+    <!-- Mensajes de feedback específicos de las acciones realizadas -->
+    <div th:if="${param.success != null and param.success[0] == 'rol'}" class="alert alert-success">
+        ¡Rol actualizado correctamente y reflejado en el panel!
+    </div>
+    
+    <div th:if="${param.success != null and param.success[0] == 'password'}" class="alert alert-success">
+        ¡Contraseña encriptada y actualizada con éxito!
+    </div>
+
+    <!-- ¡NUEVO! Alerta para eliminación exitosa -->
+    <div th:if="${param.success != null and param.success[0] == 'eliminado'}" class="alert alert-success" style="background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;">
+        El usuario ha sido eliminado definitivamente del sistema.
+    </div>
+
+    <div th:if="${param.error != null and param.error[0] == 'vacio'}" class="alert alert-error">
+        Error: La contraseña no puede estar vacía o contener solo espacios.
+    </div>
+    
+    <div th:if="${param.error != null and param.error[0] == 'no-existe'}" class="alert alert-error">
+        Error: El usuario que intenta eliminar ya no existe en la base de datos.
+    </div>
+
     <!-- Contenedor de la Tabla -->
     <div class="table-container">
-        <!-- Mostrar la tabla solo si hay registros en la lista -->
         <table th:if="${!#lists.isEmpty(usuarios)}">
             <thead>
                 <tr>
-                    <th style="width: 80px;">ID</th>
+                    <th style="width: 60px;">ID</th>
                     <th>Nombre de Usuario</th>
-                    <th>Email</th>
-                    <th>Contraseña (BCrypt)</th>
-                    <th>Rol Asignado</th>
+                    <th>Rol Actual</th>
+                    <th>Modificar Rol</th>
+                    <th>Cambiar Contraseña</th>
+                    <!-- ¡NUEVO! Encabezado de eliminación -->
+                    <th style="text-align: center; width: 100px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:each="Usuario1 : ${usuarios}">
                     <td th:text="${Usuario1.idUsuario}" style="font-weight: 600; color: var(--text-muted);"></td>
                     <td th:text="${Usuario1.username}" style="font-weight: 500;"></td>
-                    <td th:text="${Usuario1.email}"></td>
-                    <td>
-                        <!-- Al no usar JS para interactuar, aplicamos una elipsis CSS para truncar el hash largo de forma limpia -->
-                        <div class="password-hash" th:text="${Usuario1.password}" th:title="${Usuario1.password}"></div>
-                    </td>
                     <td>
                         <span th:if="${Usuario1.rol == 'ROLE_ADMIN'}" class="badge badge-admin">ADMIN</span>
                         <span th:if="${Usuario1.rol != 'ROLE_ADMIN'}" class="badge badge-user">USER</span>
+                    </td>
+                    
+                    <!-- ACCIÓN 1: Modificar Rol -->
+                    <td>
+                        <form th:action="@{/admin/users/cambiar-rol}" method="POST" class="action-form">
+                            <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
+                            <input type="hidden" name="rolSeleccionado" th:value="${rolSeleccionado ?: 'ALL'}" />
+                            
+                            <select name="nuevoRol" class="select-rol" required>
+                                <option value="ROLE_USER" th:selected="${Usuario1.rol == 'ROLE_USER'}">USER</option>
+                                <option value="ROLE_ADMIN" th:selected="${Usuario1.rol == 'ROLE_ADMIN'}">ADMIN</option>
+                            </select>
+                            <button type="submit" class="btn-action">Asignar</button>
+                        </form>
+                    </td>
+
+                    <!-- ACCIÓN 2: Cambiar Contraseña -->
+                    <td>
+                        <form th:action="@{/admin/users/cambiar-password}" method="POST" class="action-form">
+                            <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
+                            <input type="hidden" name="rolSeleccionado" th:value="${rolSeleccionado ?: 'ALL'}" />
+                            
+                            <input type="password" name="nuevaPassword" placeholder="Nueva clave" class="input-password" required />
+                            <button type="submit" class="btn-action">Guardar</button>
+                        </form>
+                    </td>
+
+                    <!-- ¡NUEVO! ACCIÓN 3: Eliminar Usuario -->
+                    <td style="text-align: center;">
+                        <form th:action="@{/admin/users/eliminar}" method="POST" 
+                              th:onsubmit="return confirm('¿Estás completamente seguro de que deseas eliminar al usuario ' + [[${Usuario1.username}]] + '? Esta acción no se puede deshacer.');">
+                            <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
+                            <input type="hidden" name="rolSeleccionado" th:value="${rolSeleccionado ?: 'ALL'}" />
+                            <button type="submit" class="btn-delete">Eliminar</button>
+                        </form>
                     </td>
                 </tr>
             </tbody>
@@ -199,6 +333,5 @@
         </div>
     </div>
 </div>
-
 </body>
 </html>
