@@ -13,69 +13,135 @@
 
 <body class="bg-light">
 
-<div class="container py-5">
+<div class="container-fluid">
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="row min-vh-100">
 
-        <div>
-            <h1 class="fw-bold">
-                <i class="bi bi-gear"></i>
-                Configuración del admin
-            </h1>
+        <!-- SIDEBAR -->
+        <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
 
-            <p class="text-muted mb-0">
-                Actualiza tu perfil de administrador
-            </p>
+            <h3 class="fw-bold mb-4">
+                <i class="bi bi-shield-lock-fill text-primary"></i>
+                Admin Panel
+            </h3>
+
+            <div class="mb-4">
+                <small class="text-secondary">Usuario conectado</small>
+
+                <h5 class="mt-2">
+                    <i class="bi bi-person-circle"></i>
+                    Admin
+                </h5>
+            </div>
+
+            <hr class="border-secondary">
+
+            <!-- MENU -->
+            <div class="d-grid gap-2">
+
+                <a href="/admin/dashboard" class="btn btn-outline-light text-start">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+
+                <a href="/admin/users/create" class="btn btn-outline-light text-start">
+                    <i class="bi bi-person-plus"></i>
+                    Alta usuario
+                </a>
+
+                <a href="/admin/users/history" class="btn btn-outline-light text-start">
+                    <i class="bi bi-clock-history"></i>
+                    Historial usuarios
+                </a>
+
+                <!-- ACTIVO -->
+                <a href="/admin/settings" class="btn btn-primary text-start">
+                    <i class="bi bi-gear"></i>
+                    Configuración
+                </a>
+
+                <a href="/logout" class="btn btn-danger text-start mt-4">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Cerrar Sesión
+                </a>
+
+            </div>
+
         </div>
 
-        <a href="/admin/dashboard" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-left"></i>
-            Volver
-        </a>
+        <!-- CONTENT -->
+        <div class="col-md-9 col-lg-10 p-5">
 
-    </div>
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <!-- FORM -->
-    <div class="card shadow-sm border-0">
+                <div>
+                    <h1 class="fw-bold">
+                        <i class="bi bi-gear"></i>
+                        Configuración del admin
+                    </h1>
 
-        <div class="card-body p-4">
-
-            <form method="post" action="/admin/settings/update">
-
-                <!-- USERNAME -->
-                <div class="mb-3">
-                    <label class="form-label">Nombre de usuario</label>
-
-                    <input type="text"
-                           class="form-control"
-                           name="username"
-                           th:value="${admin.username}"
-                           required>
+                    <p class="text-muted mb-0">
+                        Actualiza tu perfil de administrador
+                    </p>
                 </div>
 
-                <!-- PASSWORD -->
-                <div class="mb-3">
-                    <label class="form-label">Nueva contraseña</label>
+            </div>
 
-                    <input type="password"
-                           class="form-control"
-                           name="password"
-                           placeholder="Dejar vacío si no cambia">
+            <!-- FORM -->
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body p-4">
+
+                    <form method="post" action="/admin/settings/update">
+
+                        <!-- USERNAME -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Nombre de usuario
+                            </label>
+
+                            <input type="text"
+                                   class="form-control"
+                                   name="username"
+                                   th:value="${admin.username}"
+                                   required>
+
+                        </div>
+
+                        <!-- PASSWORD -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Nueva contraseña
+                            </label>
+
+                            <input type="password"
+                                   class="form-control"
+                                   name="password"
+                                   placeholder="Dejar vacío si no cambia">
+
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="alert alert-warning">
+                            ⚠️ Si cambias la contraseña tendrás que volver a iniciar sesión
+                        </div>
+
+                        <!-- BUTTON -->
+                        <button class="btn btn-primary">
+
+                            <i class="bi bi-check-circle"></i>
+                            Guardar cambios
+
+                        </button>
+
+                    </form>
+
                 </div>
 
-                <!-- INFO -->
-                <div class="alert alert-warning">
-                    ⚠️ Si cambias la contraseña tendrás que volver a iniciar sesión
-                </div>
-
-                <!-- BUTTON -->
-                <button class="btn btn-primary">
-                    <i class="bi bi-check-circle"></i>
-                    Guardar cambios
-                </button>
-
-            </form>
+            </div>
 
         </div>
 
