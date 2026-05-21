@@ -13,95 +13,97 @@
 
 <body class="bg-light">
 
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <div class="row min-vh-100">
+        <div class="row min-vh-100">
 
-        <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
+            <!-- SIDEBAR -->
+            <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
 
-            <h3 class="fw-bold mb-4">
-                <i class="bi bi-shield-lock-fill text-primary"></i>
-                Admin Panel
-            </h3>
+                <h3 class="fw-bold mb-4">
+                    <i class="bi bi-shield-lock-fill text-primary"></i>
+                    Admin Panel
+                </h3>
 
-            <div class="mb-4">
-                <small class="text-secondary">Usuario conectado</small>
+                <div class="mb-4">
+                    <small class="text-secondary">Usuario conectado</small>
 
-                <h5 class="mt-2">
-                    <i class="bi bi-person-circle"></i>
-                    Admin
-                </h5>
-            </div>
-
-            <hr class="border-secondary">
-
-            <!-- MENU -->
-            <div class="d-grid gap-2">
-
-                <a href="/admin/dashboard" class="btn btn-outline-light text-start">
-                    <i class="bi bi-speedometer2"></i>
-                    Dashboard
-                </a>
-
-                <a href="/admin/users/create" class="btn btn-outline-light text-start">
-                    <i class="bi bi-person-plus"></i>
-                    Alta usuario
-                </a>
-
-        <a href="/admin/users/history" class="d-block text-white mb-3 text-decoration-none">
-            <i class="bi bi-clock-history"></i> Historial usuarios
-        </a>
-
-                <a href="/admin/settings" class="btn btn-outline-light text-start">
-                    <i class="bi bi-gear"></i>
-                    Configuración
-                </a>
-
-                <a href="/logout" class="btn btn-danger text-start mt-4">
-                    <i class="bi bi-box-arrow-right"></i>
-                    Cerrar Sesión
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- CONTENT -->
-        <div class="col-md-9 col-lg-10 p-4">
-
-            <h1 class="mb-4">Panel de administración</h1>
-
-            <div class="row g-4">
-
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5>Usuarios</h5>
-                            <p class="text-muted">Gestión de usuarios del sistema</p>
-                            <a href="/admin/users/create" class="btn btn-primary btn-sm">Crear</a>
-                        </div>
-                    </div>
+                    <h5 class="mt-2">
+                        <i class="bi bi-person-circle"></i>
+                        Admin
+                    </h5>
                 </div>
 
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5>Historial</h5>
-                        <p class="text-muted">Actividad de usuarios</p>
-                        <a href="/admin/users/history" class="btn btn-primary btn-sm">Ver</a>
-                    </div>
+                <hr class="border-secondary">
+
+                <!-- MENU -->
+                <div class="d-grid gap-2">
+
+                    <a href="/admin/dashboard" class="btn btn-outline-light text-start">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
+
+                    <a href="/admin/users/create" class="btn btn-outline-light text-start">
+                        <i class="bi bi-person-plus"></i>
+                        Alta usuario
+                    </a>
+
+                    <a href="/admin/users" class="btn btn-outline-light text-start">
+                        <i class="bi bi-clock-history"></i> Gestionar usuarios</i>
+                    </a>
+
+                    <a href="/admin/settings" class="btn btn-outline-light text-start">
+                        <i class="bi bi-gear"></i>
+                        Configuración
+                    </a>
+
+                    <a href="/logout" class="btn btn-danger text-start mt-4">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Cerrar Sesión
+                    </a>
+
                 </div>
+
             </div>
 
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h5>Configuración</h5>
-                            <p class="text-muted">Ajustes del sistema</p>
-                            <a href="/admin/settings" class="btn btn-primary btn-sm">Abrir</a>
+            <!-- CONTENT -->
+            <div class="col-md-9 col-lg-10 p-4">
+
+                <h1 class="mb-4">Panel de administración</h1>
+
+                <div class="row g-4">
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Dar de alta un Usuario</h5>
+                                <p class="text-muted">Añadir un nuevo usuario al sistema</p>
+                                <a href="/admin/users/create" class="btn btn-primary btn-sm">Crear</a>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Gestión de usuarios</h5>
+                                <p class="text-muted">Modificar/Eliminar usuarios</p>
+                                <a href="/admin/users" class="btn btn-primary btn-sm">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Configuración</h5>
+                                <p class="text-muted">Cambiar nombre o password</p>
+                                <a href="/admin/settings" class="btn btn-primary btn-sm">Abrir</a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
@@ -110,7 +112,6 @@
 
     </div>
 
-</div>
-
 </body>
+
 </html>
