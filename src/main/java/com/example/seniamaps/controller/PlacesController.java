@@ -1,7 +1,6 @@
 package com.example.seniamaps.controller;
 
 import java.time.LocalDateTime;
-import java.util.*;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,8 +18,6 @@ import com.example.seniamaps.repository.ResultadoBusquedaRepository;
 import com.example.seniamaps.repository.ResultadoRepository;
 import com.example.seniamaps.repository.UsuarioRepository;
 import com.example.seniamaps.services.GeoapifyService;
-
-
 
 @RestController
 @RequestMapping("/api")
@@ -50,7 +47,9 @@ public class PlacesController {
     public GeoapifyResponseDTO searchPlaces(
             @RequestParam double lat,
             @RequestParam double lon,
-            @RequestParam String keyword
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "3000") int radius,
+            @RequestParam(defaultValue = "20") int limit
     ) {
 
         Authentication auth =
@@ -71,63 +70,14 @@ public class PlacesController {
 
         /*
          * =====================================================
-         * CACHE CHECK
-         * =====================================================
-         */
-
-        LocalDateTime cacheLimit = LocalDateTime.now().minusHours(2);
-
-        Optional<Busqueda> cachedBusqueda =
-                busquedaRepository.findTopByQueryAndFechaBusquedaAfterOrderByFechaBusquedaDesc(
-                        keyword,
-                        cacheLimit
-                );
-
-        if (cachedBusqueda.isPresent()) {
-
-            List<ResultadoBusqueda> relaciones =
-                    resultadoBusquedaRepository.findByBusqueda(
-                            cachedBusqueda.get()
-                    );
-
-            /*
-             * =====================================================
-             * CACHE VALIDO
-             * =====================================================
-             */
-
-            if (!relaciones.isEmpty()) {
-
-                System.out.println("🟡 CACHE HIT (CON RESULTADOS)");
-
-                return geoapifyService.buildResponseFromDatabase(relaciones);
-            }
-
-            /*
-             * =====================================================
-             * CACHE VACIO → REFETCH
-             * =====================================================
-             */
-
-            System.out.println("🔴 CACHE VACIO → REFETCH API");
-
-            GeoapifyResponseDTO response =
-                    geoapifyService.searchPlaces(lat, lon, keyword);
-
-            saveResults(response, cachedBusqueda.get());
-
-            return response;
-        }
-
-        /*
-         * =====================================================
-         * NUEVA BUSQUEDA
+         * SIEMPRE API CALL
          * =====================================================
          */
 
         System.out.println("🟢 API CALL");
 
         Busqueda busqueda = new Busqueda();
+
         busqueda.setQuery(keyword);
         busqueda.setLatitud(lat);
         busqueda.setLongitud(lon);
@@ -137,7 +87,13 @@ public class PlacesController {
         busqueda = busquedaRepository.save(busqueda);
 
         GeoapifyResponseDTO response =
-                geoapifyService.searchPlaces(lat, lon, keyword);
+                geoapifyService.searchPlaces(
+                        lat,
+                        lon,
+                        keyword,
+                        radius,
+                        limit
+                );
 
         saveResults(response, busqueda);
 
@@ -146,7 +102,7 @@ public class PlacesController {
 
     /*
      * =====================================================
-     * SAVE RESULTS METHOD (REUTILIZABLE)
+     * SAVE RESULTS METHOD
      * =====================================================
      */
 
@@ -168,6 +124,7 @@ public class PlacesController {
                             .orElseGet(() -> {
 
                                 Resultado r = new Resultado();
+
                                 r.setIdLugar(p.getPlace_id());
                                 r.setNombre(p.getName());
                                 r.setDireccion(p.getFormatted());
@@ -180,6 +137,7 @@ public class PlacesController {
                             });
 
             ResultadoBusqueda rb = new ResultadoBusqueda();
+
             rb.setBusqueda(busqueda);
             rb.setResultado(resultado);
 
