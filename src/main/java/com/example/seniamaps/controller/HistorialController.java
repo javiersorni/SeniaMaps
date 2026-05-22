@@ -30,12 +30,6 @@ public class HistorialController {
                         .getContext()
                         .getAuthentication();
 
-        /*
-         * =========================================
-         * VALIDAR LOGIN
-         * =========================================
-         */
-
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || authentication.getName().equals("anonymousUser")) {
@@ -43,33 +37,14 @@ public class HistorialController {
             return "redirect:/login";
         }
 
-        /*
-         * =========================================
-         * USERNAME
-         * =========================================
-         */
-
         String username =
                 authentication.getName();
-
-        /*
-         * =========================================
-         * HISTORIAL
-         * =========================================
-         */
 
         List<Busqueda> historial =
                 busquedaRepository
                         .findByUsuarioUsernameOrderByFechaBusquedaDesc(
                                 username
                         );
-
-        /*
-         * =========================================
-         * MODEL
-         * =========================================
-         */
-
         model.addAttribute(
                 "historial",
                 historial
@@ -79,12 +54,6 @@ public class HistorialController {
                 "username",
                 username
         );
-
-        /*
-         * =========================================
-         * VIEW
-         * =========================================
-         */
 
         return "history";
     }

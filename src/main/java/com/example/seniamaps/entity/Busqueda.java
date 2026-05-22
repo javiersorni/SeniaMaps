@@ -1,6 +1,7 @@
 package com.example.seniamaps.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,4 +28,8 @@ public class Busqueda {
     @ManyToOne
     @JoinColumn(name = "idUsuario")
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "busqueda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private List<ResultadoBusqueda> resultadosBusqueda;
 }
