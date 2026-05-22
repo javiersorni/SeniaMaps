@@ -1,9 +1,12 @@
 package com.example.seniamaps.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.seniamaps.entity.Usuario;
@@ -48,17 +51,30 @@ public class AuthController {
         return "register";
     }
 
-    // 🔥 REGISTER ACTION
-    @PostMapping("/register")
-    public String registerUser(String username, String password, String email) {
-
-        Usuario usuario = new Usuario();
-        usuario.setUsername(username);
-        usuario.setEmail(email);
-        usuario.setPassword(passwordEncoder.encode(password));
-
-        usuarioRepository.save(usuario);
-
-        return "redirect:/login?registered";
+    @PostMapping("/registro")
+    public String registrarUsuario(@ModelAttribute("usuario") Usuario usuario, BindingResult result) {
+        
+        try {
+            // 1. Cambia esto por la llamada real a vuestro repositorio o servicio.
+            // Si encriptáis la contraseña antes de guardar, recordad meter esa lógica aquí.
+            usuarioRepository.save(usuario); 
+            
+            return "redirect:/login?registroExitoso";
+            
+        } catch (DataIntegrityViolationException e) {
+            // Conseguimos el motivo exacto del fallo de base de datos
+            String mensajeError = e.getMostSpecificCause().getMessage();
+            
+            if (mensajeError.contains("username")) {
+                result.rejectValue("username", "error.usuario", "El nombre de usuario ya está en uso.");
+            } else if (mensajeError.contains("email")) {
+                result.rejectValue("email", "error.usuario", "El correo electrónico ya está registrado.");
+            } else {
+                result.rejectValue("global", "error.usuario", "Error de duplicidad en los datos.");
+            }
+            
+            // Volvemos a la vista del formulario para que el usuario vea el mensaje en rojo
+            return "registro"; 
+        }
     }
 }

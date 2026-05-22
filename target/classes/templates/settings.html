@@ -55,7 +55,8 @@
                         <i class="bi bi-star"></i> Mis Favoritos
                     </a>
 
-                    <a href="/settings" class="btn btn-outline-light text-start">
+                    <!-- ACTIVO -->
+                    <a href="/settings" class="btn btn-primary text-start">
                         <i class="bi bi-gear"></i>
                         Configuración
                     </a>
@@ -77,7 +78,7 @@
                     Configuración de usuario
                 </h2>
 
-                <!-- CARD 1 -->
+                <!-- CARD 1: CAMBIAR USERNAME -->
                 <div class="card shadow-sm mb-4 border-0 rounded-4">
 
                     <div class="card-body p-4">
@@ -87,12 +88,35 @@
                             Cambiar nombre de usuario
                         </h5>
 
+                        <!-- ALERTAS USERNAME -->
+                        <div class="alert alert-danger d-flex align-items-center small py-2 mb-3" th:if="${errorUsername}">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${errorUsername}"></span>
+                        </div>
+
+                        <div class="alert alert-success d-flex align-items-center small py-2 mb-3" th:if="${exitoUsername}">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span th:text="${exitoUsername}"></span>
+                        </div>
+
+                        <div class="alert alert-info d-flex align-items-center small py-2 mb-3" th:if="${infoUsername}">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <span th:text="${infoUsername}"></span>
+                        </div>
+
                         <form method="post" th:action="@{/settings/username}">
 
                             <div class="mb-3">
                                 <label class="form-label">Nuevo nombre</label>
-                                <input type="text" class="form-control" name="username" th:value="${user.username}"
-                                    required>
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="username" 
+                                       th:value="${user.username}"
+                                       th:classappend="${errorUsername} ? 'is-invalid' : ''"
+                                       required>
+                                
+                                <!-- FEEDBACK VISUAL INPUT INVALID -->
+                                <div class="invalid-feedback" th:if="${errorUsername}" th:text="${errorUsername}"></div>
                             </div>
 
                             <button type="submit" class="btn btn-primary">
@@ -105,7 +129,7 @@
 
                 </div>
 
-                <!-- CARD 2 -->
+                <!-- CARD 2: CAMBIAR CONTRASEÑA -->
                 <div class="card shadow-sm border-0 rounded-4">
 
                     <div class="card-body p-4">
@@ -114,6 +138,17 @@
                             <i class="bi bi-lock"></i>
                             Cambiar contraseña
                         </h5>
+
+                        <!-- ALERTAS PASSWORD -->
+                        <div class="alert alert-danger d-flex align-items-center small py-2 mb-3" th:if="${errorPassword}">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${errorPassword}"></span>
+                        </div>
+
+                        <div class="alert alert-success d-flex align-items-center small py-2 mb-3" th:if="${exitoPassword}">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span th:text="${exitoPassword}"></span>
+                        </div>
 
                         <form method="post" th:action="@{/settings/password}">
 
