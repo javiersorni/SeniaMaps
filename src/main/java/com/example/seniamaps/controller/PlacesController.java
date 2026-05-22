@@ -3,12 +3,18 @@ package com.example.seniamaps.controller;
 import java.time.LocalDateTime;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.seniamaps.dto.places.GeoapifyResponseDTO;
-import com.example.seniamaps.entity.*;
-import com.example.seniamaps.repository.*;
-import com.example.seniamaps.services.*;
+import com.example.seniamaps.entity.Busqueda;
+import com.example.seniamaps.entity.Usuario;
+import com.example.seniamaps.repository.BusquedaRepository;
+import com.example.seniamaps.repository.UsuarioRepository;
+import com.example.seniamaps.services.GeoapifyService;
+import com.example.seniamaps.services.ResultadoService;
 
 @RestController
 @RequestMapping("/api")
@@ -39,14 +45,18 @@ public class PlacesController {
             @RequestParam(defaultValue = "3000") int radius,
             @RequestParam(defaultValue = "20") int limit) {
 
-        String username =
-                SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
 
         Usuario usuario = usuarioRepository.findByUsername(username)
                 .orElseThrow();
 
+        keyword = keyword.toLowerCase().trim();
+
         Busqueda busqueda = new Busqueda();
-        busqueda.setQuery(keyword.toLowerCase().trim());
+        busqueda.setQuery(keyword);
         busqueda.setLatitud(lat);
         busqueda.setLongitud(lon);
         busqueda.setFechaBusqueda(LocalDateTime.now());

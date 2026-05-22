@@ -1,5 +1,7 @@
 package com.example.seniamaps.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,4 +23,7 @@ public class ResultadoBusqueda {
     @ManyToOne
     @JoinColumn(name = "idResultado")
     private Resultado resultado;
+
+    @Column(name = "fecha_consulta")
+    private LocalDateTime fechaConsulta;
 }
