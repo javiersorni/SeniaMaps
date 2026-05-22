@@ -1,5 +1,7 @@
 package com.example.seniamaps.dto.places;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -17,5 +19,5 @@ public class PlacePropertiesDTO {
 
     private Double rating;
 
-    private String tipo;
+    private List<String> categories;
 }

@@ -1,9 +1,14 @@
 package com.example.seniamaps.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,5 +37,7 @@ public class Resultado {
 
     private Double longitud;
 
-    private String tipo;
+    @ManyToMany
+    @JoinTable(name = "resultado_categoria", joinColumns = @JoinColumn(name = "idResultado"), inverseJoinColumns = @JoinColumn(name = "idCategoria"))
+    private List<Categoria> categorias;
 }
