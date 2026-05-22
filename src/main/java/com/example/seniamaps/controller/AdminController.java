@@ -4,7 +4,9 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.repository.BusquedaRepository;
@@ -43,24 +46,50 @@ public class AdminController {
      * =====================================================
      */
     @PostMapping("/settings/update")
-    public String updateAdmin(
-            String username,
-            String password,
-            Authentication auth) {
-
-        Usuario admin = usuarioRepository
-                .findByUsername(auth.getName())
-                .orElseThrow();
-
-        admin.setUsername(username);
-
-        if (password != null && !password.isBlank()) {
-            admin.setPassword(passwordEncoder.encode(password));
+    public String actualizarPerfilAdmin(
+            @RequestParam String username,
+            @RequestParam(required = false) String password,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // 1. Recuperamos el administrador actual conectado
+            String currentAdminUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+            Usuario admin = usuarioRepository.findByUsername(currentAdminUsername)
+                    .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
+            
+            // Comprobamos si la contraseña viene vacía (o solo espacios)
+            boolean contraseñaCambiada = password != null && !password.trim().isEmpty();
+            // Comprobamos si el nombre de usuario escrito es diferente al que ya tiene
+            boolean nombreCambiado = !admin.getUsername().equals(username);
+            
+            // 2. ¡NUEVA VALIDACIÓN!: Si no ha cambiado ni el nombre ni la contraseña, avisamos sin guardar nada
+            if (!nombreCambiado && !contraseñaCambiada) {
+                redirectAttributes.addFlashAttribute("infoAdmin", "No se han detectado cambios en tu perfil.");
+                return "redirect:/admin/settings";
+            }
+            
+            // 3. Si ha cambiado el nombre, lo asignamos
+            if (nombreCambiado) {
+                admin.setUsername(username);
+            }
+            
+            // 4. Si ha cambiado la contraseña, la guardamos (y encriptamos) y forzamos logout
+            if (contraseñaCambiada) {
+                admin.setPassword(password); // o passwordEncoder.encode(password)
+                usuarioRepository.save(admin);
+                return "redirect:/logout"; 
+            }
+            
+            // Si solo cambió el nombre, guardamos aquí
+            usuarioRepository.save(admin);
+            
+            redirectAttributes.addFlashAttribute("exitoAdmin", "Perfil actualizado correctamente.");
+            return "redirect:/admin/settings";
+            
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("errorUsername", "El nombre de usuario ya está siendo utilizado por otra cuenta.");
+            return "redirect:/admin/settings";
         }
-
-        usuarioRepository.save(admin);
-
-        return "redirect:/admin/home";
     }
 
     /*
@@ -77,19 +106,41 @@ public class AdminController {
     public String createUserForm() {
         return "admin/create-user";
     }
-
     @PostMapping("/users/create")
-    public String createUser(String username, String email, String password) {
-
-        Usuario user = new Usuario();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setRol("ROLE_USER");
-
-        usuarioRepository.save(user);
-
-        return "redirect:/admin/users";
+    public String guardarNuevoUsuario(
+            @RequestParam String username,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String rol,
+            Model model) {
+        
+        try {
+            Usuario nuevoUsuario = new Usuario();
+            nuevoUsuario.setUsername(username);
+            nuevoUsuario.setEmail(email);
+            // Recuerda encriptar la password aquí si usas PasswordEncoder:
+            nuevoUsuario.setPassword(password); 
+            nuevoUsuario.setRol(rol);
+            
+            usuarioRepository.save(nuevoUsuario);
+            
+            return "redirect:/admin/users?creadoExitoso";
+            
+        } catch (DataIntegrityViolationException e) {
+            String mensajeDB = e.getMostSpecificCause().getMessage();
+            if (mensajeDB.contains("username")) {
+                model.addAttribute("errorUsername", "El nombre de usuario ya está registrado.");
+            } else if (mensajeDB.contains("email")) {
+                model.addAttribute("errorEmail", "Este correo electrónico ya está en uso.");
+            } else {
+                model.addAttribute("errorGeneral", "No se pudo guardar el usuario debido a datos duplicados.");
+            }
+            model.addAttribute("username", username);
+            model.addAttribute("email", email);
+            model.addAttribute("rol", rol);
+            
+            return "admin/create-user";
+        }
     }
 
     @GetMapping("/dashboard")

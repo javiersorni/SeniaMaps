@@ -1,4 +1,3 @@
-<!-- templates/admin/settings.html -->
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
@@ -89,10 +88,26 @@
             </div>
 
             <!-- FORM -->
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 rounded-4">
 
                 <div class="card-body p-4">
 
+                    <!-- Mensaje de Error por Duplicidad -->
+                    <div class="alert alert-danger d-flex align-items-center mb-4" th:if="${errorUsername}">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span th:text="${errorUsername}"></span>
+                    </div>
+
+                    <!-- Mensaje de Éxito -->
+                    <div class="alert alert-success d-flex align-items-center mb-4" th:if="${exitoAdmin}">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span th:text="${exitoAdmin}"></span>
+                    </div>
+
+                    <div class="alert alert-info d-flex align-items-center mb-4" th:if="${infoAdmin}">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <span th:text="${infoAdmin}"></span>
+                    </div>
                     <form method="post" action="/admin/settings/update">
 
                         <!-- USERNAME -->
@@ -106,7 +121,11 @@
                                    class="form-control"
                                    name="username"
                                    th:value="${admin.username}"
+                                   th:classappend="${errorUsername} ? 'is-invalid' : ''"
                                    required>
+                            
+                            <!-- Feedback rojo de Bootstrap si el campo falla -->
+                            <div class="invalid-feedback" th:if="${errorUsername}" th:text="${errorUsername}"></div>
 
                         </div>
 
