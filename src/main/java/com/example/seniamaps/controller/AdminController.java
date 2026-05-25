@@ -74,7 +74,7 @@ public class AdminController {
             
             // 4. Si ha cambiado la contraseña, la guardamos (y encriptamos) y forzamos logout
             if (contraseñaCambiada) {
-                admin.setPassword(password); // o passwordEncoder.encode(password)
+                admin.setPassword(passwordEncoder.encode(password)); // o passwordEncoder.encode(password)
                 usuarioRepository.save(admin);
                 return "redirect:/logout"; 
             }
@@ -118,7 +118,7 @@ public class AdminController {
             nuevoUsuario.setUsername(username);
             nuevoUsuario.setEmail(email);
             // Recuerda encriptar la password aquí si usas PasswordEncoder:
-            nuevoUsuario.setPassword(password); 
+            nuevoUsuario.setPassword(passwordEncoder.encode(password)); 
             nuevoUsuario.setRol(rol);
             
             usuarioRepository.save(nuevoUsuario);
@@ -146,7 +146,7 @@ public class AdminController {
     public String adminDashboard() {
         return "admin/dashboard";
     }
-    @Autowired
+    
     private UsuarioRepository usuarioRepository;
 
     @GetMapping("/users")
