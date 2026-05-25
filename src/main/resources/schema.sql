@@ -52,7 +52,7 @@ CREATE TABLE resultado_busqueda (
 
     idBusqueda BIGINT UNSIGNED NOT NULL,
     idResultado BIGINT UNSIGNED NOT NULL,
-    fecha_consulta DATETIME,
+    fechaConsulta DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_rb_busqueda
         FOREIGN KEY (idBusqueda)
