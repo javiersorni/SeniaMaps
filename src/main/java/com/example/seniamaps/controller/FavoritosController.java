@@ -152,25 +152,5 @@ public class FavoritosController {
 
         return "OK";
     }
-
-    // =========================
-    // RATING
-    // =========================
-    @PostMapping("/rating")
-    @ResponseBody
-    public String guardarRating(
-            @RequestParam String idLugar,
-            @RequestParam Double rating,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        Resultado resultado = resultadoRepository.findByIdLugar(idLugar)
-                .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
-
-        resultadoRatingService.saveOrUpdateRating(usuario, resultado, rating);
-
-        return "OK";
-    }
+    
 }
