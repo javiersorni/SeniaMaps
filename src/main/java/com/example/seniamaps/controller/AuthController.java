@@ -55,8 +55,8 @@ public class AuthController {
     public String registrarUsuario(@ModelAttribute("usuario") Usuario usuario, BindingResult result) {
         
         try {
-            // 1. Cambia esto por la llamada real a vuestro repositorio o servicio.
-            // Si encriptáis la contraseña antes de guardar, recordad meter esa lógica aquí.
+            
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
             usuarioRepository.save(usuario); 
             
             return "redirect:/login?registroExitoso";
