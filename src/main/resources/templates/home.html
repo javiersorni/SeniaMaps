@@ -17,448 +17,248 @@
         <div class="row min-vh-100">
 
             <!-- SIDEBAR -->
-
             <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
 
                 <h3 class="fw-bold mb-4">
-
-                    <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}" alt="Logo" height="32" class="me-2">
+                    <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}" alt="Logo" height="32"
+                        class="me-2">
                     SeniaMaps
-
                 </h3>
 
                 <div class="mb-4">
-
-                    <small class="text-secondary">
-                        Usuario conectado
-                    </small>
-
+                    <small class="text-secondary">Usuario conectado</small>
                     <h5 class="mt-2">
-
                         <i class="bi bi-person-circle"></i>
-
                         <span th:text="${#strings.capitalize(username)}"></span>
-
                     </h5>
-
                 </div>
 
                 <hr class="border-secondary">
 
-                <!-- MENU -->
-
                 <div class="d-grid gap-2">
-
                     <a href="/home" class="btn btn-primary text-start">
-
-                        <i class="bi bi-house-door"></i>
-                        Inicio
-
+                        <i class="bi bi-house-door"></i> Inicio
                     </a>
 
                     <a href="/history" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-clock-history"></i>
-                        Historial
-
+                        <i class="bi bi-clock-history"></i> Historial
                     </a>
 
                     <a href="/favoritos" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-star"></i>
-                        Mis Favoritos
-
+                        <i class="bi bi-star"></i> Mis Favoritos
                     </a>
 
                     <a href="/settings" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-gear"></i>
-                        Configuración
-
+                        <i class="bi bi-gear"></i> Configuración
                     </a>
 
                     <a href="/logout" class="btn btn-danger text-start mt-4">
-
-                        <i class="bi bi-box-arrow-right"></i>
-                        Cerrar sesión
-
+                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
                     </a>
-
                 </div>
 
             </div>
 
-            <!-- MAIN CONTENT -->
-
+            <!-- MAIN -->
             <div class="col-md-9 col-lg-10 p-5">
 
-                <!-- HEADER -->
-
                 <div class="mb-5">
-
                     <h1 class="fw-bold">
-
                         Bienvenido,
                         <span th:text="${#strings.capitalize(username)}"></span>
-
                     </h1>
-
                     <p class="text-muted">
-
                         Busca negocios cercanos usando Geoapify
-
                     </p>
-
                 </div>
 
-                <!-- SEARCH CARD -->
-
+                <!-- SEARCH -->
                 <div class="card shadow-sm border-0 rounded-4 mb-5">
-
                     <div class="card-body p-4">
 
                         <h3 class="mb-4">
-
                             <i class="bi bi-search"></i>
                             Buscar negocios
-
                         </h3>
 
                         <form id="form-busqueda">
-
                             <div class="input-group input-group-lg">
-
                                 <input type="text" id="campo-busqueda" class="form-control"
                                     placeholder="Ej: mercadona, pizza, farmacia, hotel" required>
 
                                 <button class="btn btn-primary" type="submit">
-
-                                    <i class="bi bi-search"></i>
-                                    Buscar
-
+                                    <i class="bi bi-search"></i> Buscar
                                 </button>
-
                             </div>
-
                         </form>
 
                         <br>
 
                         <div class="mb-3">
-
-                            <label class="form-label">
-
-                                Radio de búsqueda
-
-                            </label>
-
+                            <label class="form-label">Radio de búsqueda</label>
                             <select id="radius" class="form-select">
-
                                 <option value="1000">1 km</option>
                                 <option value="3000" selected>3 km</option>
                                 <option value="5000">5 km</option>
                                 <option value="10000">10 km</option>
-
                             </select>
-
                         </div>
 
                         <div class="mb-3">
-
-                            <label class="form-label">
-
-                                Número de resultados
-
-                            </label>
-
+                            <label class="form-label">Número de resultados</label>
                             <select id="limit" class="form-select">
-
                                 <option value="5">5 resultados</option>
                                 <option value="10">10 resultados</option>
                                 <option value="20" selected>20 resultados</option>
                                 <option value="50">50 resultados</option>
-
                             </select>
-
                         </div>
 
                         <p id="status" class="mt-3 text-muted fw-semibold"></p>
 
                     </div>
-
                 </div>
 
                 <!-- RESULTS -->
-
                 <div id="resultados" class="row g-4"></div>
 
             </div>
-
         </div>
-
     </div>
 
     <script th:inline="javascript">
 
-        const urlSearch =
-        /*[[@{/api/places}]]*/ '/api/places';
+        const urlSearch = /*[[@{/api/places}]]*/ '/api/places';
 
-        document.getElementById('form-busqueda')
-            .addEventListener('submit', async function (e) {
+        document.getElementById('form-busqueda').addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-                e.preventDefault();
+            const keyword = document.getElementById('campo-busqueda').value;
+            const radius = document.getElementById('radius').value;
+            const limit = document.getElementById('limit').value;
 
-                const keyword =
-                    document.getElementById('campo-busqueda').value;
+            navigator.geolocation.getCurrentPosition(async function (position) {
 
-                const radius =
-                    document.getElementById('radius').value;
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
 
-                const limit =
-                    document.getElementById('limit').value;
-
-                if (!navigator.geolocation) {
-
-                    document.getElementById('status').innerText =
-                        "Geolocalización no soportada";
-
-                    return;
-                }
-
-                document.getElementById('status').innerText =
-                    "Buscando... ⏳";
-
-                navigator.geolocation.getCurrentPosition(
-
-                    async function (position) {
-
-                        const lat =
-                            position.coords.latitude;
-
-                        const lon =
-                            position.coords.longitude;
-
-                        try {
-
-                            const response = await fetch(
-                                `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
-                            );
-
-                            if (!response.ok) {
-
-                                throw new Error(
-                                    "Error HTTP: " + response.status
-                                );
-                            }
-
-                            const data =
-                                await response.json();
-
-                            console.log(
-                                "RESPUESTA BACKEND:",
-                                data
-                            );
-
-                            document.getElementById('status').innerText =
-                                "Búsqueda completada ✅";
-
-                            mostrarResultados(data);
-
-                        } catch (err) {
-
-                            console.error(err);
-
-                            document.getElementById('status').innerText =
-                                "Error en búsqueda ❌: " + err.message;
-                        }
-
-                    },
-
-                    function (error) {
-
-                        document.getElementById('status').innerText =
-                            "Error geolocalización: " + error.message;
-                    }
+                const response = await fetch(
+                    `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
                 );
+
+                const data = await response.json();
+                mostrarResultados(data);
             });
+        });
 
         function mostrarResultados(data) {
 
-            const contenedor =
-                document.getElementById("resultados");
-
+            const contenedor = document.getElementById("resultados");
             contenedor.innerHTML = "";
-
-            if (!data
-                || !data.features
-                || data.features.length === 0) {
-
-                contenedor.innerHTML = `
-
-                <div class="col-12">
-
-                    <div class="alert alert-warning shadow-sm">
-
-                        <i class="bi bi-exclamation-triangle"></i>
-                        No hay resultados
-
-                    </div>
-
-                </div>
-            `;
-
-                return;
-            }
 
             data.features.forEach(f => {
 
                 const p = f.properties || {};
 
-                const idLugar =
-                    p.place_id ||
-                    p.datasource?.raw?.place_id ||
-                    crypto.randomUUID();
+                const idLugar = p.place_id;   // ⚠️ IMPORTANTE: NO randomUUID
+                const nombre = p.name || "Sin nombre";
+                const direccion = p.formatted || "Sin dirección";
+                const lat = p.lat || "";
+                const lon = p.lon || "";
 
-                const nombre =
-                    p.name || "Sin nombre";
-
-                const direccion =
-                    p.formatted || "Sin dirección";
-
-                const lat =
-                    p.lat || "";
-
-                const lon =
-                    p.lon || "";
-
-                const rating =
-                    p.rating ?? null;
+                const userRating = p.userRating ?? null;
 
                 contenedor.innerHTML += `
+        <div class="col-md-6 col-xl-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <div class="card-body">
 
-                <div class="col-md-6 col-xl-4">
+                    <h5 class="fw-bold">
+                        <i class="bi bi-shop text-primary"></i> ${nombre}
+                    </h5>
 
-                    <div class="card h-100 shadow-sm border-0 rounded-4">
+                    <p class="text-muted">${direccion}</p>
 
-                        <div class="card-body">
+                    <div class="mb-3">
 
-                            <h5 class="card-title fw-bold">
+                        <label class="form-label small text-muted">
+                            Tu valoración
+                        </label>
 
-                                <i class="bi bi-shop text-primary"></i>
-                                ${nombre}
+                        ${userRating !== null && userRating !== undefined
+                        ? `
+                                <div>
+                                    <span class="badge bg-success">⭐ ${userRating}</span>
+                                    <button class="btn btn-sm btn-outline-primary ms-2"
+                                        onclick="mostrarInputRating('${idLugar}')">
+                                        Editar
+                                    </button>
+                                </div>
 
-                            </h5>
+                                <div id="rating-box-${idLugar}" class="mt-2 d-none">
+                                    <input type="number" min="1" max="5" step="0.5"
+                                           class="form-control mb-2"
+                                           id="rating-${idLugar}"
+                                           value="${userRating}">
+                                    <button class="btn btn-primary btn-sm"
+                                        onclick="enviarRating('${idLugar}')">
+                                        Guardar
+                                    </button>
+                                </div>
+                            `
+                        : `
+                                <div class="input-group input-group-sm">
+                                    <input type="number" min="1" max="5" step="0.5"
+                                           class="form-control"
+                                           id="rating-${idLugar}"
+                                           placeholder="1 - 5">
 
-                            <p class="text-muted mb-3">
-
-                                <i class="bi bi-geo-alt"></i>
-                                ${direccion}
-
-                            </p>
-
-                            <div class="mb-2">
-
-                                <span class="badge bg-success">
-
-                                    ⭐ ${rating ?? 'N/A'}
-
-                                </span>
-
-                            </div>
-
-                            <small class="text-secondary">
-
-                                📍 ${lat}, ${lon}
-
-                            </small>
-
-                            <div class="mt-3">
-
-                                <button
-                                    class="btn btn-warning w-100"
-                                    onclick='guardarFavorito(
-                                        ${JSON.stringify(idLugar)},
-                                        ${JSON.stringify(nombre)},
-                                        ${JSON.stringify(direccion)},
-                                        ${JSON.stringify(lat)},
-                                        ${JSON.stringify(lon)},
-                                        ${rating === null ? null : rating}
-                                    )'
-                                >
-
-                                    <i class="bi bi-star-fill"></i>
-                                    Añadir a favoritos
-
-                                </button>
-
-                            </div>
-
-                        </div>
+                                    <button class="btn btn-outline-primary"
+                                            onclick="enviarRating('${idLugar}')">
+                                        ⭐
+                                    </button>
+                                </div>
+                            `
+                    }
 
                     </div>
 
+                    <small class="text-secondary">
+                        📍 ${lat}, ${lon}
+                    </small>
+
                 </div>
-            `;
+            </div>
+        </div>
+        `;
             });
         }
 
-        async function guardarFavorito(
-            idLugar,
-            nombre,
-            direccion,
-            latitud,
-            longitud,
-            rating
-        ) {
+        function mostrarInputRating(idLugar) {
+            document.getElementById(`rating-box-${idLugar}`).classList.remove("d-none");
+        }
 
-            try {
+        async function enviarRating(idLugar) {
 
-                const formData = new URLSearchParams();
+            const input = document.getElementById(`rating-${idLugar}`);
+            const rating = parseFloat(input.value);
 
-                formData.append("idLugar", idLugar);
-                formData.append("nombre", nombre);
-                formData.append("direccion", direccion);
-                formData.append("latitud", latitud);
-                formData.append("longitud", longitud);
-
-                if (rating !== null && rating !== undefined) {
-
-                    formData.append("rating", rating);
-                }
-
-                const response = await fetch('/favoritos/agregar', {
-
-                    method: 'POST',
-
-                    headers: {
-                        'Content-Type':
-                            'application/x-www-form-urlencoded'
-                    },
-
-                    body: formData
-                });
-
-                const result = await response.text();
-
-                if (result === "OK") {
-
-                    alert("Favorito guardado ⭐");
-
-                } else if (result === "YA_EXISTE") {
-
-                    alert("Ya estaba en favoritos");
-
-                } else {
-
-                    alert("Error al guardar");
-                }
-
-            } catch (err) {
-
-                console.error(err);
-
-                alert("Error de conexión");
+            if (!rating || rating < 1 || rating > 5) {
+                alert("Rating inválido");
+                return;
             }
+
+            const formData = new URLSearchParams();
+            formData.append("idLugar", idLugar);
+            formData.append("rating", rating);
+
+            await fetch("/rating/guardar", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData
+            });
+
+            location.reload();
         }
 
     </script>
