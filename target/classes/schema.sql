@@ -126,5 +126,6 @@ CREATE TABLE etiqueta (
 
     FOREIGN KEY (idResultado)
         REFERENCES resultado(idResultado)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT uq_usuario_resultado_etiqueta UNIQUE (idUsuario, idResultado, nombreEtiqueta)
 );
