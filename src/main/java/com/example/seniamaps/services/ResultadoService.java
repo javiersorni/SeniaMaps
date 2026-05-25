@@ -1,15 +1,19 @@
 package com.example.seniamaps.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.seniamaps.dto.places.GeoapifyResponseDTO;
 import com.example.seniamaps.dto.places.PlaceFeatureDTO;
 import com.example.seniamaps.dto.places.PlacePropertiesDTO;
-import com.example.seniamaps.entity.*;
+import com.example.seniamaps.entity.Busqueda;
+import com.example.seniamaps.entity.Resultado;
+import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.mapper.CategoriaMapper;
-import com.example.seniamaps.repository.*;
+import com.example.seniamaps.repository.CategoriaRepository;
+import com.example.seniamaps.repository.ResultadoBusquedaRepository;
+import com.example.seniamaps.repository.ResultadoRepository;
 
 @Service
 public class ResultadoService {
@@ -18,19 +22,23 @@ public class ResultadoService {
     private final ResultadoBusquedaRepository resultadoBusquedaRepository;
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper categoriaMapper;
+    private final RatingService ratingService;
 
     public ResultadoService(
             ResultadoRepository resultadoRepository,
             ResultadoBusquedaRepository resultadoBusquedaRepository,
             CategoriaRepository categoriaRepository,
-            CategoriaMapper categoryMapper) {
+            CategoriaMapper categoryMapper,
+            RatingService ratingService) {
 
         this.resultadoRepository = resultadoRepository;
         this.resultadoBusquedaRepository = resultadoBusquedaRepository;
         this.categoriaRepository = categoriaRepository;
         this.categoriaMapper = categoryMapper;
+        this.ratingService = ratingService;
     }
 
+    // ✅ ESTE TE FALTABA
     public void saveResults(List<PlaceFeatureDTO> features, Busqueda busqueda) {
 
         if (features == null) return;
@@ -49,47 +57,31 @@ public class ResultadoService {
 
             resultado.setNombre(p.getName());
             resultado.setDireccion(p.getFormatted());
-            resultado.setRating(p.getRating());
             resultado.setLatitud(p.getLat());
             resultado.setLongitud(p.getLon());
 
-            // categorías
-            if (p.getCategories() != null) {
+            resultadoRepository.save(resultado);
+        }
+    }
 
-                List<Categoria> categorias = new ArrayList<>();
+    // ✔️ TU ENRICH CORRECTO
+    public void enrichRatings(GeoapifyResponseDTO response, Usuario usuario) {
 
-                for (String raw : p.getCategories()) {
+        if (response == null || response.getFeatures() == null)
+            return;
 
-                    if (!categoriaMapper.isValid(raw)) continue;
+        for (PlaceFeatureDTO feature : response.getFeatures()) {
 
-                    String clean = categoriaMapper.clean(raw);
-                    if (clean.equals("Otros")) continue;
+            PlacePropertiesDTO p = feature.getProperties();
 
-                    Categoria categoria = categoriaRepository
-                            .findByNombreCategoria(clean)
-                            .orElseGet(() -> {
-                                Categoria c = new Categoria();
-                                c.setNombreCategoria(clean);
-                                return categoriaRepository.save(c);
-                            });
+            resultadoRepository.findByIdLugar(p.getPlace_id())
+                    .ifPresent(resultado -> {
 
-                    categorias.add(categoria);
-                }
+                        Double userRating =
+                                ratingService.getUserRating(usuario, resultado);
 
-                resultado.setCategorias(categorias);
-            }
-
-            resultado = resultadoRepository.save(resultado);
-
-            boolean exists = resultadoBusquedaRepository
-                    .existsByBusquedaAndResultado(busqueda, resultado);
-
-            if (!exists) {
-                ResultadoBusqueda rb = new ResultadoBusqueda();
-                rb.setBusqueda(busqueda);
-                rb.setResultado(resultado);
-                resultadoBusquedaRepository.save(rb);
-            }
+                        p.setUserRating(userRating);
+                    });
         }
     }
 }

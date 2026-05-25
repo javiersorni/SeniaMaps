@@ -34,8 +34,6 @@ public class Resultado {
 
     private String direccion;
 
-    private Double rating;
-
     private Double latitud;
 
     private Double longitud;

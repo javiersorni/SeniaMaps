@@ -1,6 +1,7 @@
 package com.example.seniamaps.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
@@ -8,8 +9,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "busqueda")
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 public class Busqueda {
 
@@ -31,5 +32,5 @@ public class Busqueda {
 
     @OneToMany(mappedBy = "busqueda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
-    private List<ResultadoBusqueda> resultadosBusqueda;
+    private List<ResultadoBusqueda> resultadosBusqueda = new ArrayList<>();
 }

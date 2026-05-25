@@ -39,7 +39,6 @@ CREATE TABLE resultado (
     idLugar VARCHAR(255),
     nombre VARCHAR(255),
     direccion VARCHAR(255),
-    rating DOUBLE,
     latitud DOUBLE,
     longitud DOUBLE
 );
@@ -128,4 +127,18 @@ CREATE TABLE etiqueta (
         REFERENCES resultado(idResultado)
         ON DELETE CASCADE,
     CONSTRAINT uq_usuario_resultado_etiqueta UNIQUE (idUsuario, idResultado, nombreEtiqueta)
+);
+
+CREATE TABLE resultado_rating (
+    idResultadoRating BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    idUsuario BIGINT UNSIGNED NOT NULL,
+    idResultado BIGINT UNSIGNED NOT NULL,
+
+    rating DOUBLE NOT NULL,
+
+    UNIQUE (idUsuario, idResultado),
+
+    FOREIGN KEY (idUsuario) REFERENCES usuario(idUsuario) ON DELETE CASCADE,
+    FOREIGN KEY (idResultado) REFERENCES resultado(idResultado) ON DELETE CASCADE
 );

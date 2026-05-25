@@ -1,7 +1,10 @@
 package com.example.seniamaps.controller;
 
+import com.example.seniamaps.dto.FavoritoDTO;
 import com.example.seniamaps.entity.*;
+import com.example.seniamaps.mapper.FavoritoMapper;
 import com.example.seniamaps.repository.*;
+import com.example.seniamaps.services.ResultadoRatingService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +31,13 @@ public class FavoritosController {
     private ResultadoRepository resultadoRepository;
 
     @Autowired
-    private EtiquetaRepository etiquetaRepository; // Inyectamos el nuevo repositorio
+    private EtiquetaRepository etiquetaRepository;
+
+    @Autowired
+    private FavoritoMapper favoritoMapper;
+
+    @Autowired
+    private ResultadoRatingService resultadoRatingService;
 
     // =========================
     // LISTAR FAVORITOS
@@ -40,16 +49,19 @@ public class FavoritosController {
         Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        List<Favorito> listaFavoritos = favoritoRepository.findByUsuario(usuario);
+        List<FavoritoDTO> listaFavoritos = favoritoRepository.findByUsuario(usuario)
+                .stream()
+                .map(f -> favoritoMapper.toDTO(f, usuario))
+                .toList();
 
         model.addAttribute("username", userDetails.getUsername());
-        model.addAttribute("listaFavoritos", listaFavoritos); // Mantenemos vuestro nombre original
+        model.addAttribute("listaFavoritos", listaFavoritos);
 
         return "favoritos";
     }
 
     // =========================
-    // CREAR ETIQUETA DESDE FAVORITOS
+    // CREAR ETIQUETA
     // =========================
     @PostMapping("/etiqueta/add")
     public String añadirEtiqueta(
@@ -57,29 +69,37 @@ public class FavoritosController {
             @RequestParam String nombreEtiqueta,
             @AuthenticationPrincipal UserDetails userDetails,
             RedirectAttributes redirectAttributes) {
-        
+
         try {
+
             if (nombreEtiqueta == null || nombreEtiqueta.trim().isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorEtiqueta", "El nombre de la etiqueta no puede estar vacío.");
+                redirectAttributes.addFlashAttribute(
+                        "errorEtiqueta",
+                        "El nombre de la etiqueta no puede estar vacío.");
                 return "redirect:/favoritos";
             }
 
             Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
+
             Resultado resultado = resultadoRepository.findById(idResultado)
                     .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
 
             Etiqueta etiqueta = new Etiqueta();
-            etiqueta.setNombreEtiqueta(nombreEtiqueta.trim().toLowerCase()); // Guardado estético en minúsculas
+            etiqueta.setNombreEtiqueta(nombreEtiqueta.trim().toLowerCase());
             etiqueta.setUsuario(usuario);
             etiqueta.setResultado(resultado);
 
             etiquetaRepository.save(etiqueta);
-            redirectAttributes.addFlashAttribute("exitoEtiqueta", "¡Etiqueta añadida con éxito!");
+
+            redirectAttributes.addFlashAttribute(
+                    "exitoEtiqueta",
+                    "¡Etiqueta añadida con éxito!");
 
         } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute("errorEtiqueta", "Ya has añadido esa etiqueta a este sitio.");
+            redirectAttributes.addFlashAttribute(
+                    "errorEtiqueta",
+                    "Ya has añadido esa etiqueta a este sitio.");
         }
 
         return "redirect:/favoritos";
@@ -89,8 +109,9 @@ public class FavoritosController {
     // ELIMINAR FAVORITO
     // =========================
     @PostMapping("/eliminar")
-    public String quitarFavorito(@RequestParam Long idFavorito,
-                                 @AuthenticationPrincipal UserDetails userDetails) {
+    public String quitarFavorito(
+            @RequestParam Long idFavorito,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
         Favorito favorito = favoritoRepository.findById(idFavorito)
                 .orElseThrow(() -> new RuntimeException("Favorito no encontrado"));
@@ -105,12 +126,13 @@ public class FavoritosController {
     }
 
     // =========================
-    // AGREGAR FAVORITO (CLEAN API)
+    // AGREGAR FAVORITO
     // =========================
     @PostMapping("/agregar")
     @ResponseBody
-    public String agregarFavorito(@RequestParam String idLugar,
-                                  @AuthenticationPrincipal UserDetails userDetails) {
+    public String agregarFavorito(
+            @RequestParam String idLugar,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
         Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -118,9 +140,7 @@ public class FavoritosController {
         Resultado resultado = resultadoRepository.findByIdLugar(idLugar)
                 .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
 
-        boolean yaExiste = favoritoRepository.existsByUsuarioAndResultado(usuario, resultado);
-
-        if (yaExiste) {
+        if (favoritoRepository.existsByUsuarioAndResultado(usuario, resultado)) {
             return "YA_EXISTE";
         }
 

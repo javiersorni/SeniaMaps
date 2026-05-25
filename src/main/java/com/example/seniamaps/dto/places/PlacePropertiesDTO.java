@@ -17,7 +17,7 @@ public class PlacePropertiesDTO {
 
     private Double lon;
 
-    private Double rating;
+    private Double userRating;
 
     private List<String> categories;
 }
