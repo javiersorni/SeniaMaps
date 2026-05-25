@@ -9,16 +9,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="etiqueta")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Etiqueta {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="idEtiqueta")
     private Long idEtiqueta;
     
-    @Column(name="nombreEtiqueta")
+    @Column(name="nombreEtiqueta", nullable=false)
     private String nombreEtiqueta;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,17 +34,5 @@ public class Etiqueta {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idResultado", nullable = false)
     private Resultado resultado;
-
-    public Long getIdEtiqueta() {
-        return idEtiqueta;
-    }
-
-    public String getNombreEtiqueta() {
-        return nombreEtiqueta;
-    }
-
-    public void setNombreEtiqueta(String nombreEtiqueta) {
-        this.nombreEtiqueta = nombreEtiqueta;
-    }
     
 }
