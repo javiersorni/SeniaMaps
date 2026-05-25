@@ -24,6 +24,6 @@ public class ResultadoBusqueda {
     @JoinColumn(name = "idResultado")
     private Resultado resultado;
 
-    @Column(name = "fecha_consulta")
+    @Column(name = "fechaConsulta")
     private LocalDateTime fechaConsulta;
 }
