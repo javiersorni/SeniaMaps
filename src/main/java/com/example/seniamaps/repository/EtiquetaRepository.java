@@ -2,10 +2,16 @@ package com.example.seniamaps.repository;
 
 import com.example.seniamaps.entity.Etiqueta;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 
-@Repository
 public interface EtiquetaRepository extends JpaRepository<Etiqueta, Long> {
-    List<Etiqueta> findByUsuarioUsername(String username);
+    
+    // Filtra las etiquetas por su nombre exacto
+    List<Etiqueta> findByNombreEtiqueta(String nombreEtiqueta);
+    
+    // Elimina una etiqueta concreta vinculada a un resultado específico
+    void deleteByResultadoIdResultadoAndNombreEtiqueta(Long idResultado, String nombreEtiqueta);
+    
+    // Elimina todas las etiquetas de un resultado (Para cuando se quita de favoritos)
+    void deleteByResultadoIdResultado(Long idResultado);
 }
