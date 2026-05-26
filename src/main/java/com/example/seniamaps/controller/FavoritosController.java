@@ -22,141 +22,166 @@ import java.util.List;
 @RequestMapping("/favoritos")
 public class FavoritosController {
 
-    @Autowired
-    private FavoritoRepository favoritoRepository;
+        @Autowired
+        private FavoritoRepository favoritoRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+        @Autowired
+        private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private ResultadoRepository resultadoRepository;
+        @Autowired
+        private ResultadoRepository resultadoRepository;
 
-    @Autowired
-    private EtiquetaRepository etiquetaRepository;
+        @Autowired
+        private EtiquetaRepository etiquetaRepository;
 
-    @Autowired
-    private FavoritoMapper favoritoMapper;
+        @Autowired
+        private FavoritoMapper favoritoMapper;
 
-    @Autowired
-    private ResultadoRatingService resultadoRatingService;
+        @Autowired
+        private ResultadoRatingService resultadoRatingService;
 
-    // =========================
-    // LISTAR FAVORITOS
-    // =========================
-    @GetMapping
-    public String verFavoritos(Model model, Principal principal) {
-        
-        if (principal == null) return "redirect:/login";
+        // =========================
+        // LISTAR FAVORITOS
+        // =========================
+        @GetMapping
+        public String verFavoritos(Model model, Principal principal) {
 
-        Usuario usuario = usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Usuario no encontrado"));
+                if (principal == null)
+                        return "redirect:/login";
 
-        List<FavoritoDTO> listaFavoritos = favoritoRepository.findByUsuario(usuario)
-                .stream()
-                .map(f -> favoritoMapper.toDTO(f, usuario))
-                .toList();
+                Usuario usuario = usuarioRepository.findByUsername(principal.getName())
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                                                "Usuario no encontrado"));
 
-        model.addAttribute("username", principal.getName());
-        model.addAttribute("listaFavoritos", listaFavoritos);
+                List<FavoritoDTO> listaFavoritos = favoritoRepository.findByUsuario(usuario)
+                                .stream()
+                                .map(f -> favoritoMapper.toDTO(f, usuario))
+                                .toList();
 
-        return "favoritos";
-    }
+                model.addAttribute("username", principal.getName());
+                model.addAttribute("listaFavoritos", listaFavoritos);
 
-    // =========================
-    // CREAR ETIQUETA
-    // =========================
-    @PostMapping("/etiqueta/add")
-    public String añadirEtiqueta(
-            @RequestParam Long idResultado,
-            @RequestParam String nombreEtiqueta,
-            Principal principal,
-            RedirectAttributes redirectAttributes) {
+                return "favoritos";
+        }
 
-        if (principal == null) return "redirect:/login";
+        // =========================
+        // CREAR ETIQUETA
+        // =========================
+        @PostMapping("/etiqueta/add")
+        public String añadirEtiqueta(
+                        @RequestParam Long idResultado,
+                        @RequestParam String nombreEtiqueta,
+                        Principal principal,
+                        RedirectAttributes redirectAttributes) {
 
-        try {
-            if (nombreEtiqueta == null || nombreEtiqueta.trim().isEmpty()) {
-                redirectAttributes.addFlashAttribute(
-                        "errorEtiqueta",
-                        "El nombre de la etiqueta no puede estar vacío.");
+                if (principal == null)
+                        return "redirect:/login";
+
+                try {
+                        if (nombreEtiqueta == null || nombreEtiqueta.trim().isEmpty()) {
+                                redirectAttributes.addFlashAttribute(
+                                                "errorEtiqueta",
+                                                "El nombre de la etiqueta no puede estar vacío.");
+                                return "redirect:/favoritos";
+                        }
+
+                        Usuario usuario = usuarioRepository.findByUsername(principal.getName())
+                                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+                        Resultado resultado = resultadoRepository.findById(idResultado)
+                                        .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
+
+                        Etiqueta etiqueta = new Etiqueta();
+                        etiqueta.setNombreEtiqueta(nombreEtiqueta.trim().toLowerCase());
+                        etiqueta.setUsuario(usuario);
+                        etiqueta.setResultado(resultado);
+
+                        etiquetaRepository.save(etiqueta);
+
+                        redirectAttributes.addFlashAttribute(
+                                        "exitoEtiqueta",
+                                        "¡Etiqueta añadida con éxito!");
+
+                } catch (DataIntegrityViolationException e) {
+                        redirectAttributes.addFlashAttribute(
+                                        "errorEtiqueta",
+                                        "Ya has añadido esa etiqueta a este sitio.");
+                }
+
                 return "redirect:/favoritos";
-            }
-
-            Usuario usuario = usuarioRepository.findByUsername(principal.getName())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-            Resultado resultado = resultadoRepository.findById(idResultado)
-                    .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
-
-            Etiqueta etiqueta = new Etiqueta();
-            etiqueta.setNombreEtiqueta(nombreEtiqueta.trim().toLowerCase());
-            etiqueta.setUsuario(usuario);
-            etiqueta.setResultado(resultado);
-
-            etiquetaRepository.save(etiqueta);
-
-            redirectAttributes.addFlashAttribute(
-                    "exitoEtiqueta",
-                    "¡Etiqueta añadida con éxito!");
-
-        } catch (DataIntegrityViolationException e) {
-            redirectAttributes.addFlashAttribute(
-                    "errorEtiqueta",
-                    "Ya has añadido esa etiqueta a este sitio.");
         }
 
-        return "redirect:/favoritos";
-    }
+        // =========================
+        // ELIMINAR FAVORITO
+        // =========================
+        @PostMapping("/eliminar")
+        public String quitarFavorito(
+                        @RequestParam Long idFavorito,
+                        Principal principal) {
 
-    // =========================
-    // ELIMINAR FAVORITO
-    // =========================
-    @PostMapping("/eliminar")
-    public String quitarFavorito(
-            @RequestParam Long idFavorito,
-            Principal principal) {
+                if (principal == null)
+                        return "redirect:/login";
 
-        if (principal == null) return "redirect:/login";
+                Favorito favorito = favoritoRepository.findById(idFavorito)
+                                .orElseThrow(() -> new RuntimeException("Favorito no encontrado"));
 
-        Favorito favorito = favoritoRepository.findById(idFavorito)
-                .orElseThrow(() -> new RuntimeException("Favorito no encontrado"));
+                if (!favorito.getUsuario().getUsername().equals(principal.getName())) {
+                        return "redirect:/favoritos?error=denied";
+                }
 
-        if (!favorito.getUsuario().getUsername().equals(principal.getName())) {
-            return "redirect:/favoritos?error=denied";
+                favoritoRepository.delete(favorito);
+
+                return "redirect:/favoritos?success=deleted";
         }
 
-        favoritoRepository.delete(favorito);
+        // =========================
+        // AGREGAR FAVORITO
+        // =========================
+        @PostMapping("/agregar")
+        @ResponseBody
+        public String agregarFavorito(
+                        @RequestParam String idLugar,
+                        Principal principal) {
 
-        return "redirect:/favoritos?success=deleted";
-    }
+                if (principal == null)
+                        return "USUARIO_NO_AUTENTICADO";
 
-    // =========================
-    // AGREGAR FAVORITO
-    // =========================
-    @PostMapping("/agregar")
-    @ResponseBody
-    public String agregarFavorito(
-            @RequestParam String idLugar,
-            Principal principal) {
+                Usuario usuario = usuarioRepository.findByUsername(principal.getName())
+                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (principal == null) return "USUARIO_NO_AUTENTICADO";
+                Resultado resultado = resultadoRepository.findByIdLugar(idLugar)
+                                .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
 
-        Usuario usuario = usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                if (favoritoRepository.existsByUsuarioAndResultado(usuario, resultado)) {
+                        return "YA_EXISTE";
+                }
 
-        Resultado resultado = resultadoRepository.findByIdLugar(idLugar)
-                .orElseThrow(() -> new RuntimeException("Resultado no encontrado"));
+                Favorito favorito = new Favorito();
+                favorito.setUsuario(usuario);
+                favorito.setResultado(resultado);
 
-        if (favoritoRepository.existsByUsuarioAndResultado(usuario, resultado)) {
-            return "YA_EXISTE";
+                favoritoRepository.save(favorito);
+
+                return "OK";
         }
 
-        Favorito favorito = new Favorito();
-        favorito.setUsuario(usuario);
-        favorito.setResultado(resultado);
+        @PostMapping("/rating/update")
+        public String updateRating(
+                        @RequestParam Long idResultado,
+                        @RequestParam Double rating,
+                        Principal principal) {
 
-        favoritoRepository.save(favorito);
+                if (principal == null)
+                        return "redirect:/login";
 
-        return "OK";
-    }
+                Usuario usuario = usuarioRepository.findByUsername(principal.getName())
+                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+                Resultado resultado = resultadoRepository.findById(idResultado)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resultado no encontrado"));
+
+                resultadoRatingService.saveOrUpdateRating(usuario, resultado, rating);
+
+                return "redirect:/favoritos";
+        }
 }
