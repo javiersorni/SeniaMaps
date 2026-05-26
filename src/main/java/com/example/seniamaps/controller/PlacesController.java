@@ -2,6 +2,7 @@ package com.example.seniamaps.controller;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,16 +37,14 @@ public class PlacesController {
 
         @GetMapping("/places")
         public GeoapifyResponseDTO searchPlaces(
+                        @AuthenticationPrincipal org.springframework.security.core.userdetails.User user,
                         @RequestParam double lat,
                         @RequestParam double lon,
                         @RequestParam String keyword,
                         @RequestParam(defaultValue = "3000") int radius,
                         @RequestParam(defaultValue = "20") int limit) {
 
-                String username = SecurityContextHolder
-                                .getContext()
-                                .getAuthentication()
-                                .getName();
+                String username = user.getUsername();
 
                 Usuario usuario = usuarioRepository.findByUsername(username)
                                 .orElseThrow();

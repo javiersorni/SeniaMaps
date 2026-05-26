@@ -20,7 +20,7 @@ public class ResultadoBusqueda {
     @JoinColumn(name = "idBusqueda")
     private Busqueda busqueda;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idResultado")
     private Resultado resultado;
 

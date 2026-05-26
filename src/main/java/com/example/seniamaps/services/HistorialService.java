@@ -10,6 +10,8 @@ import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.mapper.HistorialMapper;
 import com.example.seniamaps.repository.BusquedaRepository;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class HistorialService {
 
@@ -39,11 +41,15 @@ public class HistorialService {
                     dto.setFechaBusqueda(b.getFechaBusqueda());
 
                     dto.setResultados(
-                            historialMapper.toResultadosDTO(b, usuario)
-                    );
+                            historialMapper.toResultadosDTO(b, usuario));
 
                     return dto;
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void borrarHistorialPorUsername(String username) {
+        busquedaRepository.deleteByUsername(username);
     }
 }
