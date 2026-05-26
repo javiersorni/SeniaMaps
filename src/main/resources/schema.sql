@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS Test;
-CREATE DATABASE IF NOT EXISTS Test;
-USE Test;
+DROP DATABASE IF EXISTS seniamaps;
+CREATE DATABASE IF NOT EXISTS seniamaps;
+USE seniamaps;
 
 -- =====================
 -- USUARIO
