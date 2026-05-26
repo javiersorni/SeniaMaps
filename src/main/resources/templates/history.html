@@ -74,7 +74,10 @@
 
             <!-- MAIN -->
             <div class="col-md-9 col-lg-10 p-5">
-
+                <button class="btn btn-danger mb-3" onclick="borrarHistorial()">
+                    <i class="bi bi-trash"></i>
+                    Borrar historial
+                </button>
                 <h1 class="fw-bold mb-4">
                     Historial de Búsquedas
                 </h1>
@@ -354,7 +357,29 @@
                     alert('Error de red');
                 });
         }
+        async function borrarHistorial() {
 
+            if (!confirm("¿Seguro que quieres borrar TODO el historial? Esta acción no se puede deshacer.")) {
+                return;
+            }
+
+            try {
+                const response = await fetch("/history/clear", {
+                    method: "POST"
+                });
+
+                const data = await response.text();
+
+                if (data === "OK") {
+                    location.reload();
+                } else {
+                    alert("Error al borrar historial");
+                }
+
+            } catch (e) {
+                alert("Error de red");
+            }
+        }
     </script>
 
 </body>
