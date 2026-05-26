@@ -29,6 +29,7 @@ public class FavoritoMapper {
         // DTO del resultado
         ResultadoDTO resultadoDTO = new ResultadoDTO();
 
+        resultadoDTO.setIdResultado(r.getIdResultado());
         resultadoDTO.setIdLugar(r.getIdLugar());
         resultadoDTO.setNombre(r.getNombre());
         resultadoDTO.setDireccion(r.getDireccion());

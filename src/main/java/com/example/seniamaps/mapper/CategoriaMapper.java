@@ -15,15 +15,15 @@ public class CategoriaMapper {
             case "hotel", "hostal" -> "accommodation.hotel";
             case "hospital" -> "healthcare.hospital";
             case "farmacia" -> "healthcare.pharmacy";
-
+            case "cine" -> "entertainment.cinema";
             case "mercadona",
-                 "consum",
-                 "aldi",
-                 "lidl",
-                 "dia",
-                 "dialprix",
-                 "carrefour"
-                    -> "commercial.supermarket";
+                    "consum",
+                    "aldi",
+                    "lidl",
+                    "dia",
+                    "dialprix",
+                    "carrefour" ->
+                "commercial.supermarket";
 
             default -> "commercial";
         };
@@ -31,36 +31,40 @@ public class CategoriaMapper {
 
     public String clean(String raw) {
 
-        if (raw == null) return "Otros";
+        if (raw == null || raw.isBlank())
+            return "Otros";
 
         raw = raw.toLowerCase();
 
-        return switch (raw) {
+        if (raw.contains("pharmacy"))
+            return "Farmacia";
+        if (raw.contains("hospital"))
+            return "Hospital";
+        if (raw.contains("restaurant"))
+            return "Restaurante";
+        if (raw.contains("cafe"))
+            return "Café";
+        if (raw.contains("fast_food"))
+            return "Comida rápida";
+        if (raw.contains("supermarket"))
+            return "Supermercado";
+        if (raw.contains("shopping_mall"))
+            return "Centro comercial";
+        if (raw.contains("cinema"))
+            return "Cine";
+        if (raw.contains("hotel"))
+            return "Hotel";
 
-            case "catering.restaurant", "restaurant" -> "Restaurante";
-            case "catering.cafe", "catering.coffee_shop" -> "Café";
-            case "catering.fast_food", "fast_food" -> "Comida rápida";
-
-            case "accommodation.hotel" -> "Hotel";
-            case "healthcare.pharmacy" -> "Farmacia";
-            case "healthcare.hospital" -> "Hospital";
-
-            case "commercial.supermarket" -> "Supermercado";
-            case "commercial.shopping_mall" -> "Centro comercial";
-
-            case "entertainment.cinema" -> "Cine";
-
-            default -> "Otros";
-        };
+        return "Otros";
     }
 
     public boolean isValid(String raw) {
 
         return raw != null &&
                 (raw.startsWith("catering.") ||
-                 raw.startsWith("healthcare.") ||
-                 raw.startsWith("commercial.") ||
-                 raw.startsWith("accommodation.") ||
-                 raw.startsWith("entertainment."));
+                        raw.startsWith("healthcare.") ||
+                        raw.startsWith("commercial.") ||
+                        raw.startsWith("accommodation.") ||
+                        raw.startsWith("entertainment."));
     }
 }

@@ -9,16 +9,20 @@ import com.example.seniamaps.entity.Resultado;
 import com.example.seniamaps.entity.ResultadoBusqueda;
 import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.services.ResultadoRatingService;
-
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class HistorialMapper {
 
     private final ResultadoRatingService ratingService;
+    private final CategoriaMapper categoriaMapper;
 
-    public HistorialMapper(ResultadoRatingService ratingService) {
+    public HistorialMapper(ResultadoRatingService ratingService, CategoriaMapper categoriaMapper) {
         this.ratingService = ratingService;
+        this.categoriaMapper = categoriaMapper;
     }
 
     public List<ResultadoDTO> toResultadosDTO(Busqueda busqueda, Usuario usuario) {
@@ -47,19 +51,17 @@ public class HistorialMapper {
         dto.setLatitud(r.getLatitud());
         dto.setLongitud(r.getLongitud());
 
-        if (r.getCategorias() != null) {
-            dto.setCategorias(
-                    r.getCategorias()
-                            .stream()
-                            .map(Categoria::getNombreCategoria)
-                            .toList()
-            );
-        }
+        dto.setCategorias(
+                r.getCategorias() == null
+                        ? List.of()
+                        : r.getCategorias().stream()
+                                .map(Categoria::getNombreCategoria)
+                                .filter(Objects::nonNull)
+                                .filter(s -> !s.isBlank())
+                                .distinct()
+                                .collect(Collectors.toCollection(ArrayList::new)));
 
-        dto.setUserRating(
-                ratingService.getUserRating(usuario, r)
-        );
-
+        dto.setUserRating(ratingService.getUserRating(usuario, r));
         dto.setFechaConsulta(rb.getFechaConsulta());
 
         return dto;

@@ -150,6 +150,7 @@
                 );
 
                 const data = await response.json();
+                console.log("RESPUESTA BACKEND:", data);
                 mostrarResultados(data);
             });
         });
@@ -163,72 +164,85 @@
 
                 const p = f.properties || {};
 
-                const idLugar = p.place_id;   // ⚠️ IMPORTANTE: NO randomUUID
+                const idLugar = p.place_id;
                 const nombre = p.name || "Sin nombre";
                 const direccion = p.formatted || "Sin dirección";
                 const lat = p.lat || "";
                 const lon = p.lon || "";
-
                 const userRating = p.userRating ?? null;
 
                 contenedor.innerHTML += `
         <div class="col-md-6 col-xl-4">
             <div class="card h-100 shadow-sm border-0 rounded-4">
+
                 <div class="card-body">
 
-                    <h5 class="fw-bold">
+                    <!-- TITULO -->
+                    <h5 class="fw-bold mb-2">
                         <i class="bi bi-shop text-primary"></i> ${nombre}
                     </h5>
 
-                    <p class="text-muted">${direccion}</p>
+                    <p class="text-muted small mb-1">${direccion}</p>
 
-                    <div class="mb-3">
+                    <div class="text-secondary small mb-3">
+                        📍 ${lat}, ${lon}
+                    </div>
 
-                        <label class="form-label small text-muted">
-                            Tu valoración
-                        </label>
+                    <!-- ===================== -->
+                    <!-- RATING SECTION -->
+                    <!-- ===================== -->
+                    <div class="mb-3 p-3 border rounded-3 bg-light">
 
-                        ${userRating !== null && userRating !== undefined
-                        ? `
-                                <div>
-                                    <span class="badge bg-success">⭐ ${userRating}</span>
-                                    <button class="btn btn-sm btn-outline-primary ms-2"
-                                        onclick="mostrarInputRating('${idLugar}')">
-                                        Editar
-                                    </button>
-                                </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                Valoración
+                            </span>
 
-                                <div id="rating-box-${idLugar}" class="mt-2 d-none">
-                                    <input type="number" min="1" max="5" step="0.5"
-                                           class="form-control mb-2"
-                                           id="rating-${idLugar}"
-                                           value="${userRating}">
-                                    <button class="btn btn-primary btn-sm"
-                                        onclick="enviarRating('${idLugar}')">
-                                        Guardar
-                                    </button>
-                                </div>
-                            `
-                        : `
-                                <div class="input-group input-group-sm">
-                                    <input type="number" min="1" max="5" step="0.5"
-                                           class="form-control"
-                                           id="rating-${idLugar}"
-                                           placeholder="1 - 5">
-
-                                    <button class="btn btn-outline-primary"
-                                            onclick="enviarRating('${idLugar}')">
-                                        ⭐
-                                    </button>
-                                </div>
-                            `
+                            ${userRating !== null
+                        ? `<span class="badge bg-success">⭐ ${userRating}</span>`
+                        : `<span class="text-muted small">Sin valoración</span>`
                     }
+                        </div>
+
+                        <div class="input-group input-group-sm">
+                            <input type="number" min="1" max="5" step="0.5"
+                                   class="form-control"
+                                   id="rating-${idLugar}"
+                                   placeholder="1 - 5">
+
+                            <button class="btn btn-outline-primary"
+                                    onclick="enviarRating('${idLugar}')">
+                                Guardar
+                            </button>
+                        </div>
 
                     </div>
 
-                    <small class="text-secondary">
-                        📍 ${lat}, ${lon}
-                    </small>
+                    <!-- ===================== -->
+                    <!-- FAVORITOS SECTION -->
+                    <!-- ===================== -->
+                    <div class="p-3 border rounded-3 bg-white">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+
+                            <span class="fw-semibold">
+                                <i class="bi bi-star text-warning"></i>
+                                Favoritos
+                            </span>
+
+                            <span class="text-muted small">
+                                Guardar lugar
+                            </span>
+
+                        </div>
+
+                        <button class="btn btn-outline-warning btn-sm w-100"
+                                onclick="addFavorito('${idLugar}', '${nombre}', '${direccion}')">
+                            <i class="bi bi-star"></i> Añadir a favoritos
+                        </button>
+
+                    </div>
 
                 </div>
             </div>
@@ -236,7 +250,6 @@
         `;
             });
         }
-
         function mostrarInputRating(idLugar) {
             document.getElementById(`rating-box-${idLugar}`).classList.remove("d-none");
         }
@@ -263,7 +276,40 @@
 
             location.reload();
         }
+        function addFavorito(idLugar, nombre, direccion) {
 
+            fetch('/favoritos/agregar', {
+
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+
+                body: new URLSearchParams({
+                    idLugar: idLugar,
+                    nombre: nombre,
+                    direccion: direccion || ''
+                })
+
+            })
+                .then(res => res.text())
+                .then(data => {
+
+                    if (data === 'OK') {
+                        alert('Añadido a favoritos');
+                    }
+                    else if (data === 'YA_EXISTE') {
+                        alert('Ya está en favoritos');
+                    }
+                    else {
+                        alert('Error al añadir');
+                    }
+
+                })
+                .catch(() => {
+                    alert('Error de red');
+                });
+        }
     </script>
 
 </body>

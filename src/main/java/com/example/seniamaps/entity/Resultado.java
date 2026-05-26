@@ -1,5 +1,6 @@
 package com.example.seniamaps.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -26,7 +27,7 @@ public class Resultado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idResultado;
+    private Long idResultado;
 
     private String idLugar;
 
@@ -40,7 +41,7 @@ public class Resultado {
 
     @ManyToMany
     @JoinTable(name = "resultado_categoria", joinColumns = @JoinColumn(name = "idResultado"), inverseJoinColumns = @JoinColumn(name = "idCategoria"))
-    private List<Categoria> categorias;
+    private List<Categoria> categorias = new ArrayList<>();
     @OneToMany(mappedBy = "resultado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Etiqueta> etiquetas;
+    private List<Etiqueta> etiquetas = new ArrayList<>();
 }
