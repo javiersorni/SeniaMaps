@@ -64,6 +64,11 @@ public class ResultadoService {
             resultado.setDireccion(p.getFormatted());
             resultado.setLatitud(p.getLat());
             resultado.setLongitud(p.getLon());
+
+            if (resultado.getIdResultado() != null) {
+                resultado.getCategorias().clear();
+            }
+
             List<Categoria> categorias = new ArrayList<>();
 
             for (String cat : p.getCategories()) {
@@ -83,8 +88,8 @@ public class ResultadoService {
 
                 categorias.add(categoria);
             }
-
-            resultado.setCategorias(categorias);
+            resultado.getCategorias().clear();
+            resultado.getCategorias().addAll(categorias);
             resultadoRepository.save(resultado);
 
             // 🔥 ESTO ES LO QUE TE FALTA
