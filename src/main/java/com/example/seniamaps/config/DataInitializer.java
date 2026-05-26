@@ -19,17 +19,26 @@ public class DataInitializer {
         return args -> {
 
             String adminUsername = "admin";
+            String adminEmail = "admin@sistema.com";
 
-            boolean exists = usuarioRepository
+            // 1. Comprobamos si el username está libre
+            boolean usernameExists = usuarioRepository
                     .findByUsername(adminUsername)
                     .isPresent();
 
-            if (!exists) {
+            // 2. Comprobamos si el email está libre en la base de datos
+            // Nota: Si no tienes existsByEmail declarado, usa findByEmail(adminEmail).isPresent()
+            // o simplemente usa la query manual para evitar fallos de compilación instantáneos:
+            boolean emailExists = usuarioRepository.findAll().stream()
+                    .anyMatch(u -> adminEmail.equalsIgnoreCase(u.getEmail()));
+
+            // 🚀 SÓLO SE CREA SI NINGUNO DE LOS DOS DATOS ESTÁ YA EN LA BASE DE DATOS
+            if (!usernameExists && !emailExists) {
 
                 Usuario admin = new Usuario();
 
                 admin.setUsername(adminUsername);
-                admin.setEmail("admin@sistema.com");
+                admin.setEmail(adminEmail);
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setRol("ROLE_ADMIN");
 
@@ -39,7 +48,7 @@ public class DataInitializer {
                 System.out.println("👤 user: admin");
                 System.out.println("🔑 pass: admin123");
             } else {
-                System.out.println("🟡 ADMIN YA EXISTE");
+                System.out.println("🟡 EL ADMINISTRADOR O SU CORREO YA EXISTEN EN LA BASE DE DATOS. NO SE CREA DUPLICADO.");
             }
         };
     }

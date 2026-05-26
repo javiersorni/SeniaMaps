@@ -43,6 +43,11 @@ public class AdminController {
      * UPDATE ADMIN SETTINGS
      * =====================================================
      */
+/*
+     * =====================================================
+     * UPDATE ADMIN SETTINGS (Corregido)
+     * =====================================================
+     */
     @PostMapping("/settings/update")
     public String actualizarPerfilAdmin(
             @RequestParam String username,
@@ -55,31 +60,42 @@ public class AdminController {
             Usuario admin = usuarioRepository.findByUsername(currentAdminUsername)
                     .orElseThrow(() -> new RuntimeException("Administrador no encontrado"));
             
-            // Comprobamos si la contraseña viene vacía (o solo espacios)
             boolean contraseñaCambiada = password != null && !password.trim().isEmpty();
-            // Comprobamos si el nombre de usuario escrito es diferente al que ya tiene
             boolean nombreCambiado = !admin.getUsername().equals(username);
             
-            // 2. ¡NUEVA VALIDACIÓN!: Si no ha cambiado ni el nombre ni la contraseña, avisamos sin guardar nada
             if (!nombreCambiado && !contraseñaCambiada) {
                 redirectAttributes.addFlashAttribute("infoAdmin", "No se han detectado cambios en tu perfil.");
                 return "redirect:/admin/settings";
             }
             
-            // 3. Si ha cambiado el nombre, lo asignamos
             if (nombreCambiado) {
                 admin.setUsername(username);
             }
             
-            // 4. Si ha cambiado la contraseña, la guardamos (y encriptamos) y forzamos logout
             if (contraseñaCambiada) {
-                admin.setPassword(passwordEncoder.encode(password)); // o passwordEncoder.encode(password)
+                admin.setPassword(passwordEncoder.encode(password));
                 usuarioRepository.save(admin);
                 return "redirect:/logout"; 
             }
             
             // Si solo cambió el nombre, guardamos aquí
             usuarioRepository.save(admin);
+            
+            // === 🚀 CLAVE: ACTUALIZAR LA SESIÓN EN SPRING SECURITY ===
+            // Creamos un nuevo token de autenticación con el nuevo nombre y las mismas credenciales/roles
+            org.springframework.security.core.Authentication authActual = 
+                    SecurityContextHolder.getContext().getAuthentication();
+            
+            org.springframework.security.authentication.UsernamePasswordAuthenticationToken nuevaAuth = 
+                    new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                            username, // El nuevo nombre de usuario
+                            admin.getPassword(), 
+                            authActual.getAuthorities()
+                    );
+            
+            // Reemplazamos la credencial vieja por la nueva en el contexto de la app
+            SecurityContextHolder.getContext().setAuthentication(nuevaAuth);
+            // =========================================================
             
             redirectAttributes.addFlashAttribute("exitoAdmin", "Perfil actualizado correctamente.");
             return "redirect:/admin/settings";
