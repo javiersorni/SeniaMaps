@@ -52,8 +52,17 @@
             </div>
 
             <div class="col-md-9 col-lg-10 p-4">
-                <h1 class="mb-4">Mis Sitios Favoritos</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
 
+                    <h1 class="mb-4">Mis Sitios Favoritos</h1>
+
+                    <!-- 🔥 BOTÓN EXPORTAR CSV AÑADIDO -->
+                    <a href="/export/csv" class="btn btn-success">
+                        <i class="bi bi-file-earmark-spreadsheet"></i>
+                        Exportar CSV
+                    </a>
+
+                </div>
                 <div th:if="${param.success != null and param.success[0] == 'deleted'}"
                     class="alert alert-success alert-dismissible fade show">
                     <i class="bi bi-check-circle-fill me-2"></i> Eliminado correctamente
@@ -97,7 +106,9 @@
 
                                         <td class="fw-bold text-dark" th:text="${fav.resultado.nombre}"></td>
 
-                                        <td th:text="${fav.resultado.direccion != null ? fav.resultado.direccion : 'No disponible'}"></td>
+                                        <td
+                                            th:text="${fav.resultado.direccion != null ? fav.resultado.direccion : 'No disponible'}">
+                                        </td>
 
                                         <td>
                                             <span th:if="${fav.resultado.categorias != null}"
@@ -111,23 +122,20 @@
 
                                                 <div class="text-warning fw-bold">
                                                     <i class="bi bi-star-fill"></i>
-                                                    <span th:text="${fav.resultado.userRating != null ? fav.resultado.userRating : '0'}"></span>
+                                                    <span
+                                                        th:text="${fav.resultado.userRating != null ? fav.resultado.userRating : '0'}"></span>
                                                 </div>
 
                                                 <form method="post" action="/favoritos/rating/update"
-                                                      class="d-flex gap-2 align-items-center">
+                                                    class="d-flex gap-2 align-items-center">
 
                                                     <input type="hidden" name="idResultado"
-                                                           th:value="${fav.resultado.idResultado}" />
+                                                        th:value="${fav.resultado.idResultado}" />
 
                                                     <!-- CAMBIO A INPUT MANUAL -->
-                                                    <input type="number"
-                                                           name="rating"
-                                                           class="form-control form-control-sm"
-                                                           min="1"
-                                                           max="5"
-                                                           step="0.1"
-                                                           placeholder="0-5" />
+                                                    <input type="number" name="rating"
+                                                        class="form-control form-control-sm" min="1" max="5" step="0.1"
+                                                        placeholder="0-5" />
 
                                                     <button type="submit" class="btn btn-sm btn-outline-warning">
                                                         <i class="bi bi-check-lg"></i>
@@ -147,8 +155,7 @@
                                                         class="d-inline m-0 p-0">
                                                         <input type="hidden" name="resultadoId"
                                                             th:value="${fav.resultado.idResultado}">
-                                                        <input type="hidden" name="tagName"
-                                                            th:value="${et}">
+                                                        <input type="hidden" name="tagName" th:value="${et}">
                                                         <button type="submit" class="btn-close"
                                                             style="font-size: 0.5rem; padding: 0.1rem;"
                                                             title="Eliminar etiqueta"></button>
@@ -161,10 +168,8 @@
 
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2">
-                                                <button class="btn btn-outline-primary btn-sm"
-                                                    type="button"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalEtiqueta"
+                                                <button class="btn btn-outline-primary btn-sm" type="button"
+                                                    data-bs-toggle="modal" data-bs-target="#modalEtiqueta"
                                                     th:data-id="${fav.resultado.idResultado}"
                                                     th:data-nombre="${fav.resultado.nombre}"
                                                     onclick="configurarModal(this)">
