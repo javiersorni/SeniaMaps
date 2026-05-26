@@ -1,6 +1,9 @@
 package com.example.seniamaps.controller;
 
-import org.springframework.dao.DataIntegrityViolationException;
+import java.security.Principal;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.seniamaps.entity.Usuario;
@@ -42,31 +46,43 @@ public class UserSettingsController {
     }
 
     @PostMapping("/username")
-    public String cambiarUsername(@RequestParam String username, RedirectAttributes redirectAttributes) {
-        try {
-            // 1. Recuperamos el usuario actual autenticado
-            String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-            Usuario user = userRepository.findByUsername(currentUsername)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
-            // 2. Comprobamos si el nombre realmente ha cambiado
-            if (!user.getUsername().equals(username)) {
-                user.setUsername(username);
-                userRepository.save(user);
-                
-                redirectAttributes.addFlashAttribute("exitoUsername", "Nombre de usuario actualizado correctamente.");
-            } else {
-                // Si el nombre es exactamente igual al que ya tenía
-                redirectAttributes.addFlashAttribute("infoUsername", "No se han detectado cambios en tu nombre de usuario.");
-            }
-            
-            return "redirect:/settings";
-
-        } catch (DataIntegrityViolationException e) {
-            // Capturamos si el nombre de usuario ya está cogido en la Base de Datos
-            redirectAttributes.addFlashAttribute("errorUsername", "Ese nombre de usuario ya está cogido por otra persona.");
+    public String cambiarUsername(@RequestParam("username") String nuevoUsername, 
+                                Principal principal, // <--- Usar Principal es más seguro y directo
+                                RedirectAttributes redirectAttributes) {
+        
+        // 1. Control de seguridad preventiva: Si por lo que sea no hay sesión, redirigir al login
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        
+        // 2. Obtener el nombre actual de la sesión de forma segura
+        String usernameActual = principal.getName();
+        
+        // 3. Buscar el usuario en la base de datos
+        Usuario usuario = userRepository.findByUsername(usernameActual)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Usuario no encontrado"));
+        
+        // 4. Comprobar si el nuevo nombre ya está cogido por OTRA persona
+        if (userRepository.existsByUsername(nuevoUsername) && !nuevoUsername.equals(usernameActual)) {
+            redirectAttributes.addFlashAttribute("errorUsername", "El nombre de usuario ya está en uso.");
             return "redirect:/settings";
         }
+        
+        // 5. Actualizar en la base de datos
+        usuario.setUsername(nuevoUsername);
+        userRepository.save(usuario);
+        
+        // 6. Actualizar el contexto de Spring Security para que la sesión no se rompa
+        Authentication nuevaAuth = new UsernamePasswordAuthenticationToken(
+                nuevoUsername, 
+                usuario.getPassword(), 
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(nuevaAuth);
+        
+        // 7. Todo ha ido bien
+        redirectAttributes.addFlashAttribute("exitoUsername", "¡Nombre de usuario actualizado con éxito!");
+        return "redirect:/settings";
     }
 
     @PostMapping("/password")

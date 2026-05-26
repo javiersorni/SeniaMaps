@@ -108,6 +108,7 @@
                         </div>
 
                         <form method="post" th:action="@{/settings/username}">
+                            <input type="hidden" name="idUsuario" th:value="${user.idUsuario}">
 
                             <div class="mb-3">
                                 <label class="form-label">Nuevo nombre</label>
