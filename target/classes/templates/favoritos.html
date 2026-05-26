@@ -90,7 +90,7 @@
                                 <td class="fw-bold text-dark" th:text="${fav.resultado.nombre}"></td>
                                 <td th:text="${fav.resultado.direccion != null ? fav.resultado.direccion : 'No disponible'}"></td>
                                 <td>
-                                    <span th:if="${fav.resultado.categorias != null}" th:text="${#strings.listJoin(fav.resultado.categorias.![nombreCategoria], ', ')}"></span>
+                                    <span th:if="${fav.resultado.categorias != null}" th:text="${#strings.listJoin(fav.resultado.categorias, ', ')}"></span>
                                     <span th:if="${fav.resultado.categorias == null}">General</span>
                                 </td>
                                 <td>
