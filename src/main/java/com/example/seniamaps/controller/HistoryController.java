@@ -1,14 +1,16 @@
 package com.example.seniamaps.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.repository.UsuarioRepository;
 import com.example.seniamaps.services.HistorialService;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import java.security.Principal; // <-- Cambiado aquí también
 
 @Controller
 public class HistoryController {
@@ -25,16 +27,17 @@ public class HistoryController {
     }
 
     @GetMapping("/history")
-    public String history(
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User user,
-            Model model
-    ) {
+    public String history(Principal principal, Model model) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         Usuario usuario = usuarioRepository
-                .findByUsername(user.getUsername())
-                .orElseThrow();
+                .findByUsername(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Usuario no encontrado"));
 
-        model.addAttribute("username", user.getUsername());
+        model.addAttribute("username", principal.getName());
 
         model.addAttribute(
                 "historial",

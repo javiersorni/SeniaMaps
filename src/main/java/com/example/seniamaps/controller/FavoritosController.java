@@ -8,13 +8,14 @@ import com.example.seniamaps.services.ResultadoRatingService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal; // <-- Importación crucial
 import java.util.List;
 
 @Controller
@@ -43,18 +44,19 @@ public class FavoritosController {
     // LISTAR FAVORITOS
     // =========================
     @GetMapping
-    public String verFavoritos(Model model,
-                               @AuthenticationPrincipal UserDetails userDetails) {
+    public String verFavoritos(Model model, Principal principal) {
+        
+        if (principal == null) return "redirect:/login";
 
-        Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario usuario = usuarioRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Usuario no encontrado"));
 
         List<FavoritoDTO> listaFavoritos = favoritoRepository.findByUsuario(usuario)
                 .stream()
                 .map(f -> favoritoMapper.toDTO(f, usuario))
                 .toList();
 
-        model.addAttribute("username", userDetails.getUsername());
+        model.addAttribute("username", principal.getName());
         model.addAttribute("listaFavoritos", listaFavoritos);
 
         return "favoritos";
@@ -67,11 +69,12 @@ public class FavoritosController {
     public String añadirEtiqueta(
             @RequestParam Long idResultado,
             @RequestParam String nombreEtiqueta,
-            @AuthenticationPrincipal UserDetails userDetails,
+            Principal principal,
             RedirectAttributes redirectAttributes) {
 
-        try {
+        if (principal == null) return "redirect:/login";
 
+        try {
             if (nombreEtiqueta == null || nombreEtiqueta.trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute(
                         "errorEtiqueta",
@@ -79,7 +82,7 @@ public class FavoritosController {
                 return "redirect:/favoritos";
             }
 
-            Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
+            Usuario usuario = usuarioRepository.findByUsername(principal.getName())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
             Resultado resultado = resultadoRepository.findById(idResultado)
@@ -111,12 +114,14 @@ public class FavoritosController {
     @PostMapping("/eliminar")
     public String quitarFavorito(
             @RequestParam Long idFavorito,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            Principal principal) {
+
+        if (principal == null) return "redirect:/login";
 
         Favorito favorito = favoritoRepository.findById(idFavorito)
                 .orElseThrow(() -> new RuntimeException("Favorito no encontrado"));
 
-        if (!favorito.getUsuario().getUsername().equals(userDetails.getUsername())) {
+        if (!favorito.getUsuario().getUsername().equals(principal.getName())) {
             return "redirect:/favoritos?error=denied";
         }
 
@@ -132,9 +137,11 @@ public class FavoritosController {
     @ResponseBody
     public String agregarFavorito(
             @RequestParam String idLugar,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            Principal principal) {
 
-        Usuario usuario = usuarioRepository.findByUsername(userDetails.getUsername())
+        if (principal == null) return "USUARIO_NO_AUTENTICADO";
+
+        Usuario usuario = usuarioRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Resultado resultado = resultadoRepository.findByIdLugar(idLugar)
@@ -152,5 +159,4 @@ public class FavoritosController {
 
         return "OK";
     }
-    
 }

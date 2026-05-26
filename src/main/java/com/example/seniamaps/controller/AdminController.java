@@ -3,7 +3,6 @@ package com.example.seniamaps.controller;
 import java.security.Principal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -157,7 +156,7 @@ public class AdminController {
         List<Usuario> listaUsuarios;
 
         // Imprime en la consola de Spring para ver si al pulsar las pestañas te llega el rol
-        System.out.println("El rol recibido por la URL es: " + rol);
+        //System.out.println("El rol recibido por la URL es: " + rol);
 
         if (rol != null && !rol.isEmpty() && !rol.equals("ALL")) {
             listaUsuarios = usuarioRepository.findByRol(rol);
