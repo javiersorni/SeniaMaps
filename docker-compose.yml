@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # SERVICIO 1: La Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: seniamaps-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: seniamaps
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_USER: senia_user
+      MYSQL_PASSWORD: user_password_segura
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - seniamaps-net
+
+  # SERVICIO 2: Vuestra aplicación Spring Boot
+  web:
+    build: .
+    container_name: seniamaps-app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      # Modificamos la URL de conexión para que apunte al nombre del servicio "db" en lugar de "localhost"
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/seniamaps?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: senia_user
+      SPRING_DATASOURCE_PASSWORD: user_password_segura
+    depends_on:
+      - db
+    networks:
+      - seniamaps-net
+
+volumes:
+  mysql_data: # Evita que los datos de la BD se borren al apagar el contenedor
+
+networks:
+  seniamaps-net: # Red interna para que se comuniquen entre ellos
