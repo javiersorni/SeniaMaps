@@ -4,263 +4,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Gestión de Usuarios</title>
+    <title>Gestión de Usuarios - SeniaMaps</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="shortcut icon" th:href="@{/cropped-CENTRADO-NEGRO-150x150.jpg}" type="image/x-icon">
-    <style>
-        :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --background: #f8fafc;
-            --surface: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --success: #166534;
-            --success-bg: #dcfce7;
-            --error: #991b1b;
-            --error-bg: #fee2e2;
-            --error-border: #fca5a5;
-            --danger: #dc2626;
-            --danger-hover: #b91c1c;
-        }
-
-        body {
-            background-color: var(--background);
-        }
-
-        .table-container {
-            background: var(--surface);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f1f5f9;
-            color: var(--text-muted);
-            font-weight: 600;
-            padding: 16px 20px;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-        }
-
-        td {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background-color: #f8fafc;
-        }
-
-        .badge-admin {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .badge-user {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        .action-form {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .select-rol,
-        .input-password {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            font-size: 0.85rem;
-        }
-
-        .btn-action {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 7px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-action:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-delete {
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            padding: 7px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-delete:hover {
-            background-color: var(--danger-hover);
-        }
-
-        .filter-tabs {
-            display: flex;
-            background: #e2e8f0;
-            padding: 4px;
-            border-radius: 8px;
-            gap: 2px;
-        }
-
-        .tab-link {
-            display: inline-block;
-            padding: 8px 16px;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .tab-link.active {
-            background-color: white;
-            color: var(--primary-color);
-        }
-
-        .alert {
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background-color: var(--success-bg);
-            color: var(--success);
-            border: 1px solid #bbf7d0;
-        }
-
-        .alert-error {
-            background-color: var(--error-bg);
-            color: var(--error);
-            border: 1px solid var(--error-border);
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-    </style>
 </head>
 
 <body class="bg-light">
+
+    <!-- NAVBAR MÓVIL -->
+    <nav class="navbar navbar-expand-md bg-white border-bottom d-md-none">
+
+        <div class="container-fluid">
+
+            <a class="navbar-brand fw-bold text-success d-flex align-items-center"
+               href="#">
+
+                <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}"
+                     alt="Logo"
+                     height="32"
+                     class="me-2">
+
+                SeniaMaps
+
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#sidebarMenu">
+
+                <span class="navbar-toggler-icon"></span>
+
+            </button>
+
+        </div>
+
+    </nav>
 
     <div class="container-fluid">
 
         <div class="row min-vh-100">
 
             <!-- SIDEBAR -->
-            <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
+            <aside class="col-md-3 col-lg-2 collapse d-md-block bg-white border-end"
+                   id="sidebarMenu">
 
-                <h4 class="fw-bold mb-4">
-                    <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}" alt="Logo" height="32" class="me-2">
-                    Admin Panel
-                </h4>
+                <div class="p-4 d-flex flex-column h-100">
 
-                <div class="mb-4">
-                    <small class="text-secondary">
-                        Usuario conectado
-                    </small>
+                    <!-- LOGO -->
+                    <div class="mb-4 d-none d-md-flex align-items-center">
 
-                    <h5 class="mt-2">
-                        <i class="bi bi-person-circle"></i>
-                        <span th:text="${#strings.capitalize(username)}"></span>
-                    </h5>
+                        <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}"
+                             alt="Logo"
+                             height="40"
+                             class="me-2">
+
+                        <h4 class="fw-bold text-success mb-0">
+                            SeniaMaps
+                        </h4>
+
+                    </div>
+
+                    <!-- USER -->
+                    <div class="card border-0 bg-light mb-4">
+
+                        <div class="card-body">
+
+                            <small class="text-muted">
+                                Usuario conectado
+                            </small>
+
+                            <h6 class="fw-bold mt-2 mb-0 text-truncate">
+
+                                <i class="bi bi-person-circle text-success me-2"></i>
+
+                                <span th:text="${#strings.capitalize(username)}"></span>
+
+                            </h6>
+
+                        </div>
+
+                    </div>
+
+                    <!-- MENU -->
+                    <div class="nav nav-pills flex-column gap-2">
+
+                        <a href="/admin/dashboard"
+                           class="nav-link text-dark">
+
+                            <i class="bi bi-speedometer2 me-2 text-success"></i>
+                            Dashboard
+
+                        </a>
+
+                        <a href="/admin/users/create"
+                           class="nav-link text-dark">
+
+                            <i class="bi bi-person-plus me-2 text-success"></i>
+                            Alta usuario
+
+                        </a>
+
+                        <a href="/admin/users"
+                           class="nav-link active bg-success text-white">
+
+                            <i class="bi bi-people me-2"></i>
+                            Gestionar usuarios
+
+                        </a>
+
+                        <a href="/admin/settings"
+                           class="nav-link text-dark">
+
+                            <i class="bi bi-gear me-2 text-success"></i>
+                            Configuración
+
+                        </a>
+
+                    </div>
+
+                    <!-- LOGOUT -->
+                    <div class="mt-auto pt-4">
+
+                        <a href="/logout"
+                           class="btn btn-danger w-100">
+
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Cerrar sesión
+
+                        </a>
+
+                    </div>
+
                 </div>
 
-                <hr class="border-secondary">
+            </aside>
 
-                <!-- MENU -->
-                <div class="d-grid gap-2">
+            <!-- MAIN CONTENT -->
+            <main class="col-md-9 col-lg-10 p-4 p-lg-5">
 
-                    <a href="/admin/dashboard" class="btn btn-outline-light text-start">
-                        <i class="bi bi-speedometer2"></i>
-                        Dashboard
-                    </a>
+                <!-- HEADER -->
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
 
-                    <a href="/admin/users/create" class="btn btn-outline-light text-start">
-                        <i class="bi bi-person-plus"></i>
-                        Alta usuario
-                    </a>
+                    <div>
 
-                    <a href="/admin/users" class="btn btn-primary text-start">
-                        <i class="bi bi-clock-history"></i>
-                        Gestionar usuarios
-                    </a>
+                        <h1 class="fw-bold mb-1">
+                            Gestión de usuarios
+                        </h1>
 
-                    <a href="/admin/settings" class="btn btn-outline-light text-start">
-                        <i class="bi bi-gear"></i>
-                        Configuración
-                    </a>
+                        <p class="text-muted mb-0">
+                            Administra usuarios, roles y contraseñas
+                        </p>
 
-                    <a href="/logout" class="btn btn-danger text-start mt-4">
-                        <i class="bi bi-box-arrow-right"></i>
-                        Cerrar sesión
-                    </a>
+                    </div>
 
-                </div>
-
-            </div>
-
-            <!-- CONTENT -->
-            <div class="col-md-9 col-lg-10 p-4">
-
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-
-                    <h1 class="fw-bold mb-0">
-                        Gestión de Usuarios
-                    </h1>
-
-                    <div class="filter-tabs">
+                    <!-- FILTERS -->
+                    <div class="btn-group">
 
                         <a th:href="@{/admin/users(rol='ALL')}"
-                            th:classappend="${rolSeleccionado == 'ALL' || rolSeleccionado == null} ? 'active' : ''"
-                            class="tab-link">
+                           th:classappend="${rolSeleccionado == 'ALL' || rolSeleccionado == null} ? 'btn-success text-white' : 'btn-outline-success'"
+                           class="btn">
+
                             Todos
+
                         </a>
 
                         <a th:href="@{/admin/users(rol='ROLE_USER')}"
-                            th:classappend="${rolSeleccionado == 'ROLE_USER'} ? 'active' : ''" class="tab-link">
+                           th:classappend="${rolSeleccionado == 'ROLE_USER'} ? 'btn-success text-white' : 'btn-outline-success'"
+                           class="btn">
+
                             Usuarios
+
                         </a>
 
                         <a th:href="@{/admin/users(rol='ROLE_ADMIN')}"
-                            th:classappend="${rolSeleccionado == 'ROLE_ADMIN'} ? 'active' : ''" class="tab-link">
+                           th:classappend="${rolSeleccionado == 'ROLE_ADMIN'} ? 'btn-success text-white' : 'btn-outline-success'"
+                           class="btn">
+
                             Administradores
+
                         </a>
 
                     </div>
@@ -268,125 +192,280 @@
                 </div>
 
                 <!-- ALERTAS -->
-                <div th:if="${param.success != null and param.success[0] == 'rol'}" class="alert alert-success">
-                    ¡Rol actualizado correctamente!
+                <div th:if="${param.success != null and param.success[0] == 'rol'}"
+                     class="alert alert-success d-flex align-items-center">
+
+                    <i class="bi bi-check-circle-fill me-2"></i>
+
+                    Rol actualizado correctamente
+
                 </div>
 
-                <div th:if="${param.success != null and param.success[0] == 'password'}" class="alert alert-success">
-                    ¡Contraseña actualizada correctamente!
+                <div th:if="${param.success != null and param.success[0] == 'password'}"
+                     class="alert alert-success d-flex align-items-center">
+
+                    <i class="bi bi-check-circle-fill me-2"></i>
+
+                    Contraseña actualizada correctamente
+
                 </div>
 
-                <div th:if="${param.success != null and param.success[0] == 'eliminado'}" class="alert alert-success">
-                    Usuario eliminado correctamente.
+                <div th:if="${param.success != null and param.success[0] == 'eliminado'}"
+                     class="alert alert-success d-flex align-items-center">
+
+                    <i class="bi bi-check-circle-fill me-2"></i>
+
+                    Usuario eliminado correctamente
+
                 </div>
 
-                <div th:if="${param.error != null and param.error[0] == 'vacio'}" class="alert alert-error">
-                    La contraseña no puede estar vacía.
+                <div th:if="${param.error != null and param.error[0] == 'vacio'}"
+                     class="alert alert-danger d-flex align-items-center">
+
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                    La contraseña no puede estar vacía
+
                 </div>
 
-                <!-- TABLA -->
-                <div class="table-container">
+                <!-- TABLE CARD -->
+                <div class="card border-0 shadow-sm">
 
-                    <table th:if="${!#lists.isEmpty(usuarios)}">
+                    <div class="card-body p-0">
 
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Usuario</th>
-                                <th>Rol</th>
-                                <th>Modificar Rol</th>
-                                <th>Cambiar Contraseña</th>
-                                <th>Eliminar</th>
-                            </tr>
-                        </thead>
+                        <div class="table-responsive">
 
-                        <tbody>
+                            <table class="table table-hover align-middle mb-0"
+                                   th:if="${!#lists.isEmpty(usuarios)}">
 
-                            <tr th:each="Usuario1 : ${usuarios}">
+                                <thead class="table-light">
 
-                                <td th:text="${Usuario1.idUsuario}"></td>
+                                    <tr>
 
-                                <td th:text="${Usuario1.username}"></td>
+                                        <th class="px-4 py-3">
+                                            ID
+                                        </th>
 
-                                <td>
-                                    <span th:if="${Usuario1.rol == 'ROLE_ADMIN'}" class="badge badge-admin">
-                                        ADMIN
-                                    </span>
+                                        <th class="py-3">
+                                            Usuario
+                                        </th>
 
-                                    <span th:if="${Usuario1.rol != 'ROLE_ADMIN'}" class="badge badge-user">
-                                        USER
-                                    </span>
-                                </td>
+                                        <th class="py-3">
+                                            Rol
+                                        </th>
 
-                                <!-- CAMBIAR ROL -->
-                                <td>
-                                    <form th:action="@{/admin/users/cambiar-rol}" method="POST" class="action-form">
+                                        <th class="py-3">
+                                            Modificar rol
+                                        </th>
 
-                                        <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
+                                        <th class="py-3">
+                                            Cambiar contraseña
+                                        </th>
 
-                                        <select name="nuevoRol" class="select-rol">
-
-                                            <option value="ROLE_USER" th:selected="${Usuario1.rol == 'ROLE_USER'}">
-                                                USER
-                                            </option>
-
-                                            <option value="ROLE_ADMIN" th:selected="${Usuario1.rol == 'ROLE_ADMIN'}">
-                                                ADMIN
-                                            </option>
-
-                                        </select>
-
-                                        <button type="submit" class="btn-action">
-                                            Guardar
-                                        </button>
-
-                                    </form>
-                                </td>
-
-                                <!-- CAMBIAR PASSWORD -->
-                                <td>
-                                    <form th:action="@{/admin/users/cambiar-password}" method="POST"
-                                        class="action-form">
-
-                                        <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
-
-                                        <input type="password" name="nuevaPassword" placeholder="Nueva clave"
-                                            class="input-password" required>
-
-                                        <button type="submit" class="btn-action">
-                                            Cambiar
-                                        </button>
-
-                                    </form>
-                                </td>
-
-                                <!-- ELIMINAR -->
-                                <td>
-
-                                    <form th:action="@{/admin/users/eliminar}" method="POST"
-                                        th:onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?')">
-
-                                        <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
-
-                                        <button type="submit" class="btn-delete">
+                                        <th class="py-3 text-center">
                                             Eliminar
-                                        </button>
+                                        </th>
 
-                                    </form>
+                                    </tr>
 
-                                </td>
+                                </thead>
 
-                            </tr>
+                                <tbody>
 
-                        </tbody>
+                                    <tr th:each="Usuario1 : ${usuarios}">
 
-                    </table>
+                                        <!-- ID -->
+                                        <td class="px-4 fw-semibold"
+                                            th:text="${Usuario1.idUsuario}">
+                                        </td>
 
-                    <div th:if="${#lists.isEmpty(usuarios)}" class="no-results">
+                                        <!-- USERNAME -->
+                                        <td th:text="${Usuario1.username}">
+                                        </td>
 
-                        No se encontraron usuarios.
+                                        <!-- ROL -->
+                                        <td>
+
+                                            <span th:if="${Usuario1.rol == 'ROLE_ADMIN'}"
+                                                  class="badge text-bg-danger">
+
+                                                ADMIN
+
+                                            </span>
+
+                                            <span th:if="${Usuario1.rol != 'ROLE_ADMIN'}"
+                                                  class="badge text-bg-success">
+
+                                                USER
+
+                                            </span>
+
+                                        </td>
+
+                                        <!-- CAMBIAR ROL -->
+                                        <td>
+
+                                            <form th:action="@{/admin/users/cambiar-rol}"
+                                                  method="POST"
+                                                  class="d-flex gap-2 flex-wrap">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       th:value="${Usuario1.idUsuario}" />
+
+                                                <select name="nuevoRol"
+                                                        class="form-select form-select-sm">
+
+                                                    <option value="ROLE_USER"
+                                                            th:selected="${Usuario1.rol == 'ROLE_USER'}">
+
+                                                        USER
+
+                                                    </option>
+
+                                                    <option value="ROLE_ADMIN"
+                                                            th:selected="${Usuario1.rol == 'ROLE_ADMIN'}">
+
+                                                        ADMIN
+
+                                                    </option>
+
+                                                </select>
+
+                                                <button type="submit"
+                                                        class="btn btn-success btn-sm">
+
+                                                    Guardar
+
+                                                </button>
+
+                                            </form>
+
+                                        </td>
+
+                                        <!-- PASSWORD -->
+                                        <td>
+
+                                            <form th:action="@{/admin/users/cambiar-password}"
+                                                  method="POST"
+                                                  class="d-flex gap-2 flex-wrap">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       th:value="${Usuario1.idUsuario}" />
+
+                                                <input type="password"
+                                                       name="nuevaPassword"
+                                                       placeholder="Nueva clave"
+                                                       class="form-control form-control-sm"
+                                                       required>
+
+                                                <button type="submit"
+                                                        class="btn btn-outline-success btn-sm">
+
+                                                    Cambiar
+
+                                                </button>
+
+                                            </form>
+
+                                        </td>
+
+                                        <!-- ELIMINAR -->
+                                        <td class="text-center">
+
+                                            <form th:action="@{/admin/users/eliminar}"
+                                                  method="POST"
+                                                  th:onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?')">
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       th:value="${Usuario1.idUsuario}" />
+
+                                                <button type="submit"
+                                                        class="btn btn-outline-danger btn-sm">
+
+                                                    <i class="bi bi-trash"></i>
+
+                                                </button>
+
+                                            </form>
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <!-- EMPTY -->
+                        <div th:if="${#lists.isEmpty(usuarios)}"
+                             class="text-center p-5 text-muted">
+
+                            <i class="bi bi-people fs-1 d-block mb-3"></i>
+
+                            No se encontraron usuarios
+
+                        </div>
 
                     </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade"
+         id="confirmModal"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">
+                        Confirmar acción
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    ¿Deseas continuar con esta acción?
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-success">
+
+                        Confirmar
+
+                    </button>
 
                 </div>
 
@@ -395,6 +474,24 @@
         </div>
 
     </div>
+
+    <!-- SPINNER -->
+    <div class="d-none position-fixed top-50 start-50 translate-middle"
+         id="loadingSpinner"
+         style="z-index: 9999;">
+
+        <div class="spinner-border text-success"
+             role="status">
+
+            <span class="visually-hidden">
+                Loading...
+            </span>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

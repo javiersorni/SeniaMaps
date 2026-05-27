@@ -73,7 +73,9 @@ public class SecurityConfig {
                                 "/login",
                                 "/css/**",
                                 "/js/**",
-                                "/images/**"
+                                "/images/**",
+                                "/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg",
+                                "/cropped-CENTRADO-NEGRO-150x150.jpg"
                         ).permitAll()
 
                         // SOLO ADMIN
