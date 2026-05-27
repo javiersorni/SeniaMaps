@@ -9,6 +9,7 @@ import com.example.seniamaps.entity.Resultado;
 import com.example.seniamaps.entity.Usuario;
 
 public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
+
     List<Favorito> findByUsuario(Usuario usuario);
 
     boolean existsByUsuarioAndResultado(Usuario usuario, Resultado resultado);

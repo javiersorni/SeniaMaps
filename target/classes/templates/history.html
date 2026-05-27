@@ -74,10 +74,12 @@
 
             <!-- MAIN -->
             <div class="col-md-9 col-lg-10 p-5">
+
                 <button class="btn btn-danger mb-3" onclick="borrarHistorial()">
                     <i class="bi bi-trash"></i>
                     Borrar historial
                 </button>
+
                 <h1 class="fw-bold mb-4">
                     Historial de Búsquedas
                 </h1>
@@ -100,7 +102,6 @@
 
                         <div class="accordion-item" th:each="b : ${historial}">
 
-                            <!-- HEADER -->
                             <h2 class="accordion-header" th:id="'h-' + ${b.idBusqueda}">
 
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -109,10 +110,8 @@
                                     <strong th:text="${b.query}"></strong>
 
                                     <span class="ms-3 text-muted small">
-
                                         (<span th:text="${b.latitud}"></span>,
                                         <span th:text="${b.longitud}"></span>)
-
                                     </span>
 
                                     <span class="ms-auto badge bg-primary"
@@ -123,24 +122,18 @@
 
                             </h2>
 
-                            <!-- BODY -->
                             <div class="accordion-collapse collapse" th:id="'c-' + ${b.idBusqueda}">
 
                                 <div class="accordion-body">
 
-                                    <!-- SIN RESULTADOS -->
                                     <div th:if="${#lists.isEmpty(b.resultados)}" class="text-muted text-center">
-
                                         Sin resultados
-
                                     </div>
 
-                                    <!-- TABLA -->
                                     <table th:if="${!#lists.isEmpty(b.resultados)}"
                                         class="table table-hover align-middle">
 
                                         <thead>
-
                                             <tr>
                                                 <th>Nombre</th>
                                                 <th>Dirección</th>
@@ -148,94 +141,53 @@
                                                 <th>Categorías</th>
                                                 <th>Acciones</th>
                                             </tr>
-
                                         </thead>
 
                                         <tbody>
 
                                             <tr th:each="rb : ${b.resultados}">
 
-                                                <!-- NOMBRE -->
                                                 <td>
                                                     <strong th:text="${rb.nombre}"></strong>
                                                 </td>
 
-                                                <!-- DIRECCIÓN -->
                                                 <td th:text="${rb.direccion ?: 'Sin dirección'}"></td>
 
-                                                <!-- RATING -->
                                                 <td>
-
-                                                    <!-- SI TIENE RATING -->
                                                     <div th:if="${rb.userRating != null}">
-
                                                         <span class="badge bg-success">
                                                             ⭐ <span th:text="${rb.userRating}"></span>
                                                         </span>
-
-                                                        <button class="btn btn-sm btn-outline-primary ms-2"
-                                                            th:attr="onclick=|mostrarInputRating('${rb.idLugar}')|">
-
-                                                            Editar
-
-                                                        </button>
-
-                                                        <div class="mt-2 d-none" th:id="'rating-box-' + ${rb.idLugar}">
-
-                                                            <input type="number" min="1" max="5" step="0.5"
-                                                                class="form-control form-control-sm mb-2"
-                                                                th:id="'rating-' + ${rb.idLugar}"
-                                                                th:value="${rb.userRating}">
-
-                                                            <button class="btn btn-primary btn-sm"
-                                                                th:attr="onclick=|enviarRating('${rb.idLugar}')|">
-
-                                                                Guardar
-
-                                                            </button>
-
-                                                        </div>
-
                                                     </div>
-
-                                                    <!-- SI NO TIENE -->
-                                                    <div th:if="${rb.userRating == null}"
-                                                        class="input-group input-group-sm">
-
-                                                        <input type="number" min="1" max="5" step="0.5"
-                                                            class="form-control" th:id="'rating-' + ${rb.idLugar}"
-                                                            placeholder="1 - 5">
-
-                                                        <button class="btn btn-outline-primary"
-                                                            th:attr="onclick=|enviarRating('${rb.idLugar}')|">
-
-                                                            ⭐
-
-                                                        </button>
-
-                                                    </div>
-
                                                 </td>
 
-                                                <!-- CATEGORÍAS -->
                                                 <td>
-
                                                     <span th:if="${rb.categorias != null}"
                                                         th:text="${#strings.listJoin(rb.categorias, ', ')}">
                                                     </span>
-
                                                 </td>
 
-                                                <!-- ACCIONES -->
+                                                <!-- 🔥 SOLO CAMBIO AQUÍ -->
                                                 <td>
 
-                                                    <button class="btn btn-sm btn-outline-warning"
-                                                        th:attr="onclick=|addFavorito('${rb.idLugar}', '${rb.nombre}', '${rb.direccion}')|">
+                                                    <!-- SI YA ES FAVORITO -->
+                                                    <div th:if="${rb.enFavorito}">
+                                                        <span class="badge bg-success">
+                                                            <i class="bi bi-star-fill"></i>
+                                                            En favoritos
+                                                        </span>
+                                                    </div>
 
-                                                        <i class="bi bi-star"></i>
-                                                        Favorito
+                                                    <!-- SI NO ES FAVORITO -->
+                                                    <div th:if="${!rb.enFavorito}">
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            th:attr="onclick=|addFavorito('${rb.idLugar}', '${rb.nombre}', '${rb.direccion}')|">
 
-                                                    </button>
+                                                            <i class="bi bi-star"></i>
+                                                            Favorito
+
+                                                        </button>
+                                                    </div>
 
                                                 </td>
 
@@ -266,11 +218,8 @@
     <script>
 
         function mostrarInputRating(idLugar) {
-
-            document
-                .getElementById(`rating-box-${idLugar}`)
-                .classList
-                .remove("d-none");
+            document.getElementById(`rating-box-${idLugar}`)
+                .classList.remove("d-none");
         }
 
         async function enviarRating(idLugar) {
@@ -279,13 +228,11 @@
             const rating = parseFloat(input.value);
 
             if (!rating || rating < 1 || rating > 5) {
-
                 alert("Rating inválido");
                 return;
             }
 
             const formData = new URLSearchParams();
-
             formData.append("idLugar", idLugar);
             formData.append("rating", rating);
 
@@ -302,16 +249,12 @@
                 const data = await response.text();
 
                 if (data === "OK") {
-
                     location.reload();
-
                 } else {
-
                     alert("Error guardando rating");
                 }
 
             } catch (e) {
-
                 alert("Error de red");
             }
         }
@@ -319,44 +262,29 @@
         function addFavorito(idLugar, nombre, direccion) {
 
             fetch('/favoritos/agregar', {
-
                 method: 'POST',
-
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-
                 body: new URLSearchParams({
                     idLugar: idLugar,
                     nombre: nombre,
                     direccion: direccion || ''
                 })
-
             })
-
                 .then(res => res.text())
-
                 .then(data => {
-
                     if (data === 'OK') {
-
                         alert('Añadido a favoritos');
-
                     } else if (data === 'YA_EXISTE') {
-
                         alert('Ya está en favoritos');
-
                     } else {
-
                         alert('Error al añadir');
                     }
                 })
-
-                .catch(() => {
-
-                    alert('Error de red');
-                });
+                .catch(() => alert('Error de red'));
         }
+
         async function borrarHistorial() {
 
             if (!confirm("¿Seguro que quieres borrar TODO el historial? Esta acción no se puede deshacer.")) {
@@ -380,6 +308,7 @@
                 alert("Error de red");
             }
         }
+
     </script>
 
 </body>

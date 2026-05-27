@@ -15,6 +15,4 @@ public class BusquedaDTO {
     private LocalDateTime fechaBusqueda;
 
     private List<ResultadoDTO> resultados;
-
-
 }
