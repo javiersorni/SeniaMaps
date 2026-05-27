@@ -8,6 +8,7 @@ import com.example.seniamaps.entity.Categoria;
 import com.example.seniamaps.entity.Resultado;
 import com.example.seniamaps.entity.ResultadoBusqueda;
 import com.example.seniamaps.entity.Usuario;
+import com.example.seniamaps.repository.FavoritoRepository;
 import com.example.seniamaps.services.ResultadoRatingService;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,10 +20,13 @@ public class HistorialMapper {
 
     private final ResultadoRatingService ratingService;
     private final CategoriaMapper categoriaMapper;
+    private final FavoritoRepository favoritoRepository;
 
-    public HistorialMapper(ResultadoRatingService ratingService, CategoriaMapper categoriaMapper) {
+    public HistorialMapper(ResultadoRatingService ratingService, CategoriaMapper categoriaMapper,
+            FavoritoRepository favoritoRepository) {
         this.ratingService = ratingService;
         this.categoriaMapper = categoriaMapper;
+        this.favoritoRepository = favoritoRepository;
     }
 
     public List<ResultadoDTO> toResultadosDTO(Busqueda busqueda, Usuario usuario) {
@@ -39,10 +43,7 @@ public class HistorialMapper {
 
         ResultadoDTO dto = new ResultadoDTO();
 
-        // ✅ ID del historial (RELACIÓN)
         dto.setIdResultado(rb.getId());
-
-        // ✅ ID del lugar
         dto.setIdLugar(r.getIdLugar());
 
         dto.setNombre(r.getNombre());
@@ -64,6 +65,10 @@ public class HistorialMapper {
         dto.setUserRating(ratingService.getUserRating(usuario, r));
         dto.setFechaConsulta(rb.getFechaConsulta());
 
+        boolean esFavorito = favoritoRepository
+                .existsByUsuarioAndResultado(usuario, r);
+
+        dto.setEnFavorito(esFavorito);
         return dto;
     }
 }

@@ -26,4 +26,6 @@ public class ResultadoDTO {
     private List<String> etiquetas;
 
     private LocalDateTime fechaConsulta;
+
+    private Boolean enFavorito;
 }
