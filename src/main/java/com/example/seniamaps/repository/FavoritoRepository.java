@@ -15,4 +15,6 @@ public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
     boolean existsByUsuarioAndResultado(Usuario usuario, Resultado resultado);
 
     Optional<Favorito> findByUsuarioAndResultado(Usuario usuario, Resultado resultado);
+
+    boolean existsByUsuarioAndResultadoIdLugar(Usuario usuario, String idLugar);
 }

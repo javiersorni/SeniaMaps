@@ -20,4 +20,6 @@ public class PlacePropertiesDTO {
     private Double userRating;
 
     private List<String> categories;
+
+    private Boolean enFavorito;
 }
