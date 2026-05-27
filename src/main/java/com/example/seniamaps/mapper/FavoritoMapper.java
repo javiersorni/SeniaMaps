@@ -35,7 +35,8 @@ public class FavoritoMapper {
         resultadoDTO.setDireccion(r.getDireccion());
         resultadoDTO.setLatitud(r.getLatitud());
         resultadoDTO.setLongitud(r.getLongitud());
-
+        resultadoDTO.setEnFavorito(true);
+        
         resultadoDTO.setUserRating(
                 ratingService.getUserRating(usuario, r)
         );

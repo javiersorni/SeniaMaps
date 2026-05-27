@@ -12,6 +12,7 @@ import com.example.seniamaps.entity.Busqueda;
 import com.example.seniamaps.entity.Usuario;
 import com.example.seniamaps.repository.BusquedaRepository;
 import com.example.seniamaps.repository.UsuarioRepository;
+import com.example.seniamaps.services.FavoritosService;
 import com.example.seniamaps.services.GeoapifyService;
 import com.example.seniamaps.services.ResultadoService;
 
@@ -23,17 +24,20 @@ public class PlacesController {
         private final ResultadoService resultadoService;
         private final BusquedaRepository busquedaRepository;
         private final UsuarioRepository usuarioRepository;
+        private final FavoritosService favoritosService;
 
         public PlacesController(
                         GeoapifyService geoapifyService,
                         ResultadoService resultadoService,
                         BusquedaRepository busquedaRepository,
-                        UsuarioRepository usuarioRepository) {
+                        UsuarioRepository usuarioRepository,
+                        FavoritosService favoritosService) {
 
                 this.geoapifyService = geoapifyService;
                 this.resultadoService = resultadoService;
                 this.busquedaRepository = busquedaRepository;
                 this.usuarioRepository = usuarioRepository;
+                this.favoritosService = favoritosService;
         }
 
         @GetMapping("/places")
@@ -45,21 +49,20 @@ public class PlacesController {
                         @RequestParam(defaultValue = "3000") int radius,
                         @RequestParam(defaultValue = "20") int limit) {
 
-                // 🛡️ CONTROL DE SEGURIDAD INTERCEPTOR: Evita el NullPointerException si la sesión expira
+                // 🛡️ CONTROL DE SEGURIDAD INTERCEPTOR: Evita el NullPointerException si la
+                // sesión expira
                 if (user == null) {
                         throw new ResponseStatusException(
-                                HttpStatus.UNAUTHORIZED, 
-                                "Debe iniciar sesión para realizar búsquedas de lugares."
-                        );
+                                        HttpStatus.UNAUTHORIZED,
+                                        "Debe iniciar sesión para realizar búsquedas de lugares.");
                 }
 
                 String username = user.getUsername();
 
                 Usuario usuario = usuarioRepository.findByUsername(username)
                                 .orElseThrow(() -> new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND, 
-                                        "El usuario autenticado no existe en el sistema."
-                                ));
+                                                HttpStatus.NOT_FOUND,
+                                                "El usuario autenticado no existe en el sistema."));
 
                 keyword = keyword.toLowerCase().trim();
 
@@ -79,6 +82,8 @@ public class PlacesController {
 
                 // 2. ENRIQUECER ratings del usuario
                 resultadoService.enrichRatings(response, usuario);
+
+                favoritosService.enrichFavoritos(response, usuario);
 
                 // 3. devolver response ya enriquecido
                 return response;
