@@ -16,7 +16,6 @@
 
         <div class="row min-vh-100">
 
-            <!-- SIDEBAR -->
             <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
 
                 <h3 class="fw-bold mb-4">
@@ -62,7 +61,6 @@
 
             </div>
 
-            <!-- MAIN -->
             <div class="col-md-9 col-lg-10 p-5">
 
                 <div class="mb-5">
@@ -75,7 +73,6 @@
                     </p>
                 </div>
 
-                <!-- SEARCH -->
                 <div class="card shadow-sm border-0 rounded-4 mb-5">
                     <div class="card-body p-4">
 
@@ -122,7 +119,6 @@
                     </div>
                 </div>
 
-                <!-- RESULTS -->
                 <div id="resultados" class="row g-4"></div>
 
             </div>
@@ -145,13 +141,30 @@
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
 
-                const response = await fetch(
-                    `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
-                );
+                try {
+                    const response = await fetch(
+                        `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
+                    );
 
-                const data = await response.json();
-                console.log("RESPUESTA BACKEND:", data);
-                mostrarResultados(data);
+                    // 🛡️ CONTROL DE EXCEPCIÓN DE SESIÓN: Evita intentar parsear HTML como JSON si desautentica
+                    if (response.status === 401 || response.redirected) {
+                        alert("Su sesión ha expirado o se ha cerrado en otra pestaña. Será redirigido al inicio.");
+                        window.location.href = "/login";
+                        return;
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(`Error en servidor: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log("RESPUESTA BACKEND:", data);
+                    mostrarResultados(data);
+                    
+                } catch (err) {
+                    console.error("Error procesando búsqueda:", err);
+                    alert("Ocurrió un error al procesar la búsqueda. Por favor, intente de nuevo.");
+                }
             });
         });
 
@@ -177,7 +190,6 @@
 
                 <div class="card-body">
 
-                    <!-- TITULO -->
                     <h5 class="fw-bold mb-2">
                         <i class="bi bi-shop text-primary"></i> ${nombre}
                     </h5>
@@ -188,9 +200,6 @@
                         📍 ${lat}, ${lon}
                     </div>
 
-                    <!-- ===================== -->
-                    <!-- RATING SECTION -->
-                    <!-- ===================== -->
                     <div class="mb-3 p-3 border rounded-3 bg-light">
 
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -206,10 +215,10 @@
                         </div>
 
                         <div class="input-group input-group-sm">
-                            <input type="number" min="1" max="5" step="0.5"
+                            <input type="number" min="0" max="5" step="0.1"
                                    class="form-control"
                                    id="rating-${idLugar}"
-                                   placeholder="1 - 5">
+                                   placeholder="0 - 5">
 
                             <button class="btn btn-outline-primary"
                                     onclick="enviarRating('${idLugar}')">
@@ -219,9 +228,6 @@
 
                     </div>
 
-                    <!-- ===================== -->
-                    <!-- FAVORITOS SECTION -->
-                    <!-- ===================== -->
                     <div class="p-3 border rounded-3 bg-white">
 
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -259,8 +265,9 @@
             const input = document.getElementById(`rating-${idLugar}`);
             const rating = parseFloat(input.value);
 
-            if (!rating || rating < 1 || rating > 5) {
-                alert("Rating inválido");
+            // Ajustado el control de validación JS para admitir desde 0
+            if (isNaN(rating) || rating < 0 || rating > 5) {
+                alert("Por favor, introduzca un rating válido entre 0 y 5");
                 return;
             }
 
@@ -268,47 +275,61 @@
             formData.append("idLugar", idLugar);
             formData.append("rating", rating);
 
-            await fetch("/rating/guardar", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData
-            });
+            try {
+                const response = await fetch("/rating/guardar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: formData
+                });
 
-            location.reload();
+                if (response.status === 401 || response.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                location.reload();
+            } catch (err) {
+                console.error(err);
+            }
         }
+        
         function addFavorito(idLugar, nombre, direccion) {
 
             fetch('/favoritos/agregar', {
-
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-
                 body: new URLSearchParams({
                     idLugar: idLugar,
                     nombre: nombre,
                     direccion: direccion || ''
                 })
-
             })
-                .then(res => res.text())
-                .then(data => {
-
-                    if (data === 'OK') {
-                        alert('Añadido a favoritos');
-                    }
-                    else if (data === 'YA_EXISTE') {
-                        alert('Ya está en favoritos');
-                    }
-                    else {
-                        alert('Error al añadir');
-                    }
-
-                })
-                .catch(() => {
-                    alert('Error de red');
-                });
+            .then(res => {
+                if (res.status === 401 || res.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
+                return res.text();
+            })
+            .then(data => {
+                if (!data) return;
+                if (data === 'OK') {
+                    alert('Añadido a favoritos');
+                }
+                else if (data === 'YA_EXISTE') {
+                    alert('Ya está en favoritos');
+                }
+                else {
+                    alert('Error al añadir');
+                }
+            })
+            .catch(() => {
+                alert('Error de red o sesión caducada');
+            });
         }
     </script>
 

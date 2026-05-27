@@ -2,9 +2,10 @@ package com.example.seniamaps.controller;
 
 import java.time.LocalDateTime;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.seniamaps.dto.places.GeoapifyResponseDTO;
 import com.example.seniamaps.entity.Busqueda;
@@ -44,10 +45,21 @@ public class PlacesController {
                         @RequestParam(defaultValue = "3000") int radius,
                         @RequestParam(defaultValue = "20") int limit) {
 
+                // 🛡️ CONTROL DE SEGURIDAD INTERCEPTOR: Evita el NullPointerException si la sesión expira
+                if (user == null) {
+                        throw new ResponseStatusException(
+                                HttpStatus.UNAUTHORIZED, 
+                                "Debe iniciar sesión para realizar búsquedas de lugares."
+                        );
+                }
+
                 String username = user.getUsername();
 
                 Usuario usuario = usuarioRepository.findByUsername(username)
-                                .orElseThrow();
+                                .orElseThrow(() -> new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND, 
+                                        "El usuario autenticado no existe en el sistema."
+                                ));
 
                 keyword = keyword.toLowerCase().trim();
 
