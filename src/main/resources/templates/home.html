@@ -8,13 +8,8 @@
     <title>Dashboard</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <link rel="shortcut icon"
-        th:href="@{/cropped-CENTRADO-NEGRO-150x150.jpg}"
-        type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" th:href="@{/cropped-CENTRADO-NEGRO-150x150.jpg}" type="image/x-icon">
 </head>
 
 <body class="bg-light">
@@ -23,7 +18,6 @@
 
         <div class="row min-vh-100">
 
-            <!-- SIDEBAR -->
             <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
 
                 <h3 class="fw-bold mb-4">
@@ -73,7 +67,6 @@
 
             </div>
 
-            <!-- MAIN -->
             <div class="col-md-9 col-lg-10 p-5">
 
                 <div class="mb-5">
@@ -89,7 +82,6 @@
 
                 </div>
 
-                <!-- SEARCH -->
                 <div class="card shadow-sm border-0 rounded-4 mb-5">
 
                     <div class="card-body p-4">
@@ -114,12 +106,8 @@
 
                             <br>
 
-                            <!-- SOLO CAMPOS CUSTOM -->
-
                             <div class="mb-3">
-
                                 <label class="form-label">Radio de búsqueda (KM)</label>
-
                                 <input type="number"
                                     id="custom-radius"
                                     class="form-control"
@@ -127,13 +115,10 @@
                                     min="0.1"
                                     step="0.1"
                                     value="3">
-
                             </div>
 
                             <div class="mb-3">
-
                                 <label class="form-label">Número de resultados</label>
-
                                 <input type="number"
                                     id="custom-limit"
                                     class="form-control"
@@ -141,19 +126,16 @@
                                     min="1"
                                     step="1"
                                     value="20">
-
                             </div>
 
                         </form>
 
-                        <!-- STATUS -->
                         <p id="status" class="mt-3 fw-semibold text-primary"></p>
 
                     </div>
 
                 </div>
 
-                <!-- RESULTS -->
                 <div id="resultados" class="row g-4"></div>
 
             </div>
@@ -171,42 +153,53 @@
 
                 e.preventDefault();
 
-                const keyword =
-                    document.getElementById('campo-busqueda').value;
-
-                const status =
-                    document.getElementById('status');
-
-                let radiusKm =
-                    document.getElementById('custom-radius').value;
-
-                let limit =
-                    document.getElementById('custom-limit').value;
+                const keyword = document.getElementById('campo-busqueda').value;
+                const status = document.getElementById('status');
+                let radiusKm = document.getElementById('custom-radius').value;
+                let limit = document.getElementById('custom-limit').value;
 
                 const radius = parseFloat(radiusKm) * 1000;
 
-                status.innerHTML =
-                    '<i class="bi bi-arrow-repeat"></i> Realizando búsqueda...';
+                status.innerHTML = '<i class="bi bi-arrow-repeat"></i> Realizando búsqueda...';
 
                 navigator.geolocation.getCurrentPosition(async function (position) {
 
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
 
-                    const response = await fetch(
-                        `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
-                    );
+                    try {
+                        const response = await fetch(
+                            `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
+                        );
 
-                    const data = await response.json();
+                        // 🛡️ CONTROL INTERCEPTOR DE SESIÓN
+                        if (response.status === 401 || response.redirected) {
+                            alert("Su sesión ha expirado o se ha cerrado en otra pestaña. Será redirigido al inicio.");
+                            window.location.href = "/login";
+                            return;
+                        }
 
-                    mostrarResultados(data);
+                        if (!response.ok) {
+                            throw new Error(`Error en servidor: ${response.status}`);
+                        }
 
-                    status.innerHTML =
-                        `<i class="bi bi-check-circle-fill text-success"></i>
-                         Búsqueda completada: ${data.features.length} resultados`;
+                        const data = await response.json();
 
+                        mostrarResultados(data);
+
+                        status.innerHTML =
+                            `<i class="bi bi-check-circle-fill text-success"></i>
+                             Búsqueda completada: ${data.features.length} resultados`;
+
+                    } catch (err) {
+                        console.error("Error procesando búsqueda:", err);
+                        status.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-danger"></i> Error al realizar la búsqueda.`;
+                        alert("Ocurrió un error en la búsqueda. Por favor, intente de nuevo.");
+                    }
+                }, function(error) {
+                    status.innerHTML = `<i class="bi bi-geo-alt-fill text-danger"></i> Error de geolocalización.`;
+                    alert("No se pudo obtener la ubicación actual.");
                 });
-
             });
 
         function mostrarResultados(data) {
@@ -223,6 +216,10 @@
                 const direccion = p.formatted || "Sin dirección";
                 const userRating = p.userRating ?? null;
 
+                // Renderizado condicional del badge de rating inicial
+                const ratingBadgeText = userRating !== null ? `⭐ ${userRating}` : 'Sin valoración';
+                const ratingBadgeClass = userRating !== null ? 'bg-success' : 'bg-secondary';
+
                 contenedor.innerHTML += `
                 <div class="col-md-6 col-xl-4">
                     <div class="card h-100 shadow-sm border-0 rounded-4">
@@ -234,7 +231,6 @@
 
                             <p class="text-muted small mb-3">${direccion}</p>
 
-                            <!-- RATING -->
                             <div class="mb-3 p-3 border rounded-3 bg-light">
 
                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -244,8 +240,8 @@
                                         Valoración
                                     </span>
 
-                                    <span class="badge bg-secondary" id="badge-rating-${idLugar}">
-                                        ${userRating ?? 'Sin valoración'}
+                                    <span class="badge ${ratingBadgeClass}" id="badge-rating-${idLugar}">
+                                        ${ratingBadgeText}
                                     </span>
 
                                 </div>
@@ -253,12 +249,12 @@
                                 <div class="input-group input-group-sm">
 
                                     <input type="number"
-                                        min="1"
+                                        min="0"
                                         max="5"
-                                        step="0.5"
+                                        step="0.1"
                                         class="form-control"
                                         id="rating-${idLugar}"
-                                        placeholder="1 - 5">
+                                        placeholder="0 - 5">
 
                                     <button class="btn btn-outline-primary"
                                         onclick="enviarRating('${idLugar}')">
@@ -269,7 +265,6 @@
 
                             </div>
 
-                            <!-- FAVORITOS -->
                             <div class="p-3 border rounded-3 bg-white">
 
                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -306,8 +301,9 @@
             const input = document.getElementById(`rating-${idLugar}`);
             const rating = parseFloat(input.value);
 
-            if (!rating || rating < 1 || rating > 5) {
-                alert("Rating inválido");
+            // 🛡️ CORRECCIÓN CLAVE: Uso de 'isNaN' para admitir el valor numérico 0 de forma limpia
+            if (isNaN(rating) || rating < 0 || rating > 5) {
+                alert("Por favor, introduce un rating válido entre 0 y 5");
                 return;
             }
 
@@ -315,49 +311,67 @@
             formData.append("idLugar", idLugar);
             formData.append("rating", rating);
 
-            await fetch("/rating/guardar", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData
-            });
+            try {
+                const response = await fetch("/rating/guardar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: formData
+                });
 
-            document.getElementById(`badge-rating-${idLugar}`).innerHTML = rating;
-            input.value = "";
+                if (response.status === 401 || response.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                // Actualizamos visualmente el badge sin recargar completamente la página
+                const badge = document.getElementById(`badge-rating-${idLugar}`);
+                badge.innerHTML = `⭐ ${rating}`;
+                badge.className = "badge bg-success";
+                input.value = "";
+                
+            } catch (err) {
+                console.error("Error al guardar el rating:", err);
+                alert("Error de red al conectar con el servidor.");
+            }
         }
 
         function addFavorito(idLugar, nombre, direccion) {
 
             fetch('/favoritos/agregar', {
-
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-
                 body: new URLSearchParams({
                     idLugar: idLugar,
                     nombre: nombre,
                     direccion: direccion || ''
                 })
-
             })
-                .then(res => res.text())
-                .then(data => {
-
-                    if (data === 'OK') {
-                        alert('Añadido a favoritos');
-                    }
-                    else if (data === 'YA_EXISTE') {
-                        alert('Ya está en favoritos');
-                    }
-                    else {
-                        alert('Error al añadir');
-                    }
-
-                })
-                .catch(() => {
-                    alert('Error de red');
-                });
+            .then(res => {
+                if (res.status === 401 || res.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
+                return res.text();
+            })
+            .then(data => {
+                if (!data) return;
+                if (data === 'OK') {
+                    alert('Añadido a favoritos');
+                }
+                else if (data === 'YA_EXISTE') {
+                    alert('Ya está en favoritos');
+                }
+                else {
+                    alert('Error al añadir');
+                }
+            })
+            .catch(() => {
+                alert('Error de red');
+            });
         }
 
     </script>

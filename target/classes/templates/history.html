@@ -18,7 +18,6 @@
 
         <div class="row min-vh-100">
 
-            <!-- SIDEBAR -->
             <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
 
                 <h3 class="fw-bold mb-4">
@@ -32,7 +31,6 @@
 
                     <h5 class="mt-2">
                         <i class="bi bi-person-circle"></i>
-
                         <span th:text="${#strings.capitalize(username)}"></span>
                     </h5>
                 </div>
@@ -72,19 +70,16 @@
 
             </div>
 
-            <!-- MAIN -->
             <div class="col-md-9 col-lg-10 p-5">
 
-                <button class="btn btn-danger mb-3" onclick="borrarHistorial()">
-                    <i class="bi bi-trash"></i>
-                    Borrar historial
-                </button>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="fw-bold m-0">Historial de Búsquedas</h1>
+                    <button class="btn btn-danger" onclick="borrarHistorial()">
+                        <i class="bi bi-trash"></i>
+                        Borrar historial
+                    </button>
+                </div>
 
-                <h1 class="fw-bold mb-4">
-                    Historial de Búsquedas
-                </h1>
-
-                <!-- VACÍO -->
                 <div th:if="${#lists.isEmpty(historial)}" class="card p-5 text-center shadow-sm">
 
                     <i class="bi bi-inbox fs-1 text-muted"></i>
@@ -95,7 +90,6 @@
 
                 </div>
 
-                <!-- LISTA -->
                 <div th:if="${!#lists.isEmpty(historial)}">
 
                     <div class="accordion" id="accordionHistorial">
@@ -158,6 +152,31 @@
                                                         <span class="badge bg-success">
                                                             ⭐ <span th:text="${rb.userRating}"></span>
                                                         </span>
+                                                        <button class="btn btn-sm btn-outline-primary ms-2"
+                                                            th:attr="onclick=|mostrarInputRating('${rb.idLugar}')|">
+                                                            Editar
+                                                        </button>
+
+                                                        <div class="mt-2 d-none" th:id="'rating-box-' + ${rb.idLugar}">
+                                                            <input type="number" min="0" max="5" step="0.1"
+                                                                class="form-control form-control-sm mb-2"
+                                                                th:id="'rating-' + ${rb.idLugar}"
+                                                                th:value="${rb.userRating}">
+                                                            <button class="btn btn-primary btn-sm"
+                                                                th:attr="onclick=|enviarRating('${rb.idLugar}')|">
+                                                                Guardar
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div th:if="${rb.userRating == null}" class="input-group input-group-sm" style="max-width: 140px;">
+                                                        <input type="number" min="0" max="5" step="0.1"
+                                                            class="form-control" th:id="'rating-' + ${rb.idLugar}"
+                                                            placeholder="0 - 5">
+                                                        <button class="btn btn-outline-primary"
+                                                            th:attr="onclick=|enviarRating('${rb.idLugar}')|">
+                                                            ⭐
+                                                        </button>
                                                     </div>
                                                 </td>
 
@@ -167,28 +186,21 @@
                                                     </span>
                                                 </td>
 
-                                                <!-- 🔥 SOLO CAMBIO AQUÍ -->
                                                 <td>
-
-                                                    <!-- SI YA ES FAVORITO -->
                                                     <div th:if="${rb.enFavorito}">
-                                                        <span class="badge bg-success">
+                                                        <span class="badge bg-success py-2 px-3">
                                                             <i class="bi bi-star-fill"></i>
                                                             En favoritos
                                                         </span>
                                                     </div>
 
-                                                    <!-- SI NO ES FAVORITO -->
                                                     <div th:if="${!rb.enFavorito}">
                                                         <button class="btn btn-sm btn-outline-warning"
                                                             th:attr="onclick=|addFavorito('${rb.idLugar}', '${rb.nombre}', '${rb.direccion}')|">
-
                                                             <i class="bi bi-star"></i>
                                                             Favorito
-
                                                         </button>
                                                     </div>
-
                                                 </td>
 
                                             </tr>
@@ -223,12 +235,12 @@
         }
 
         async function enviarRating(idLugar) {
-
             const input = document.getElementById(`rating-${idLugar}`);
             const rating = parseFloat(input.value);
 
-            if (!rating || rating < 1 || rating > 5) {
-                alert("Rating inválido");
+            // 🛡️ CORRECCIÓN: 'isNaN' permite evaluar el valor 0 de forma correcta sin tratarlo como nulo
+            if (isNaN(rating) || rating < 0 || rating > 5) {
+                alert("Por favor, introduce un rating válido entre 0 y 5");
                 return;
             }
 
@@ -237,7 +249,6 @@
             formData.append("rating", rating);
 
             try {
-
                 const response = await fetch("/rating/guardar", {
                     method: "POST",
                     headers: {
@@ -246,8 +257,14 @@
                     body: formData
                 });
 
-                const data = await response.text();
+                // Protección por si la sesión expira
+                if (response.status === 401 || response.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
 
+                const data = await response.text();
                 if (data === "OK") {
                     location.reload();
                 } else {
@@ -260,7 +277,6 @@
         }
 
         function addFavorito(idLugar, nombre, direccion) {
-
             fetch('/favoritos/agregar', {
                 method: 'POST',
                 headers: {
@@ -272,21 +288,28 @@
                     direccion: direccion || ''
                 })
             })
-                .then(res => res.text())
-                .then(data => {
-                    if (data === 'OK') {
-                        alert('Añadido a favoritos');
-                    } else if (data === 'YA_EXISTE') {
-                        alert('Ya está en favoritos');
-                    } else {
-                        alert('Error al añadir');
-                    }
-                })
-                .catch(() => alert('Error de red'));
+            .then(res => {
+                if (res.status === 401 || res.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
+                return res.text();
+            })
+            .then(data => {
+                if (!data) return;
+                if (data === 'OK') {
+                    alert('Añadido a favoritos');
+                } else if (data === 'YA_EXISTE') {
+                    alert('Ya está en favoritos');
+                } else {
+                    alert('Error al añadir');
+                }
+            })
+            .catch(() => alert('Error de red'));
         }
 
         async function borrarHistorial() {
-
             if (!confirm("¿Seguro que quieres borrar TODO el historial? Esta acción no se puede deshacer.")) {
                 return;
             }
@@ -296,8 +319,13 @@
                     method: "POST"
                 });
 
-                const data = await response.text();
+                if (response.status === 401 || response.redirected) {
+                    alert("Su sesión ha expirado. Por favor, vuelva a iniciar sesión.");
+                    window.location.href = "/login";
+                    return;
+                }
 
+                const data = await response.text();
                 if (data === "OK") {
                     location.reload();
                 } else {
