@@ -1,623 +1,351 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org"
-    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard · SeniaMaps</title>
 
-    <title>Dashboard</title>
-
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Just Sans (fuente principal) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="shortcut icon"
-        th:href="@{/cropped-CENTRADO-NEGRO-150x150.jpg}"
-        type="image/x-icon">
-
+    <link rel="shortcut icon" th:href="@{/cropped-CENTRADO-NEGRO-150x150.jpg}" type="image/x-icon">
 </head>
 
-<body class="bg-light">
-
-    <div class="container-fluid">
-
-        <div class="row min-vh-100">
-
-            <div class="col-md-3 col-lg-2 bg-dark text-white p-4">
-
-                <h3 class="fw-bold mb-4">
-
-                    <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}"
-                        alt="Logo"
-                        height="32"
-                        class="me-2">
-
-                    SeniaMaps
-
-                </h3>
-
-                <div class="mb-4">
-
-                    <small class="text-secondary">
-                        Usuario conectado
-                    </small>
-
-                    <h5 class="mt-2">
-
-                        <i class="bi bi-person-circle"></i>
-
-                        <span th:text="${#strings.capitalize(username)}"></span>
-
-                    </h5>
-
-                </div>
-
-                <hr class="border-secondary">
-
-                <div class="d-grid gap-2">
-
-                    <a href="/home" class="btn btn-primary text-start">
-
-                        <i class="bi bi-house-door"></i>
-                        Inicio
-
-                    </a>
-
-                    <a href="/history" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-clock-history"></i>
-                        Historial
-
-                    </a>
-
-                    <a href="/favoritos" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-star"></i>
-                        Mis Favoritos
-
-                    </a>
-
-                    <a href="/etiquetas" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-tags-fill"></i>
-                        Gestionar Etiquetas
-
-                    </a>
-
-                    <a href="/settings" class="btn btn-outline-light text-start">
-
-                        <i class="bi bi-gear"></i>
-                        Configuración
-
-                    </a>
-
-                    <a href="/logout" class="btn btn-danger text-start mt-4">
-
-                        <i class="bi bi-box-arrow-right"></i>
-                        Cerrar sesión
-
-                    </a>
-
-                </div>
-
-            </div>
-
-            <div class="col-md-9 col-lg-10 p-5">
-
-                <div class="mb-5">
-
-                    <h1 class="fw-bold">
-
-                        Bienvenido,
-
-                        <span th:text="${#strings.capitalize(username)}"></span>
-
-                    </h1>
-
-                    <p class="text-muted">
-                        Busca negocios cercanos usando Geoapify
-                    </p>
-
-                </div>
-
-                <div class="card shadow-sm border-0 rounded-4 mb-5">
-
-                    <div class="card-body p-4">
-
-                        <h3 class="mb-4">
-
-                            <i class="bi bi-search"></i>
-                            Buscar negocios
-
-                        </h3>
-
-                        <form id="form-busqueda">
-
-                            <div class="input-group input-group-lg">
-
-                                <input type="text"
-                                    id="campo-busqueda"
-                                    class="form-control"
-                                    placeholder="Ej: mercadona, pizza, farmacia, hotel"
-                                    required>
-
-                                <button class="btn btn-primary" type="submit">
-
-                                    <i class="bi bi-search"></i>
-                                    Buscar
-
-                                </button>
-
-                            </div>
-
-                            <br>
-
-                            <div class="mb-3">
-
-                                <label class="form-label">
-                                    Radio de búsqueda (KM)
-                                </label>
-
-                                <input type="number"
-                                    id="custom-radius"
-                                    class="form-control"
-                                    placeholder="Ej: 3.5"
-                                    min="0.1"
-                                    step="0.1"
-                                    value="3">
-
-                            </div>
-
-                            <div class="mb-3">
-
-                                <label class="form-label">
-                                    Número de resultados
-                                </label>
-
-                                <input type="number"
-                                    id="custom-limit"
-                                    class="form-control"
-                                    placeholder="Ej: 20"
-                                    min="1"
-                                    step="1"
-                                    value="20">
-
-                            </div>
-
-                        </form>
-
-                        <p id="status" class="mt-3 fw-semibold text-primary"></p>
-
-                    </div>
-
-                </div>
-
-                <div id="resultados" class="row g-4"></div>
-
-            </div>
-
+<!-- Tema claro, tipografía Just Sans (fallback Inter / system) -->
+
+<body class="bg-light text-dark"
+    style="font-family: 'Just Sans','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">
+
+    <!-- ===== NAVBAR MÓVIL (hamburguesa) ===== -->
+    <nav class="navbar navbar-light bg-white border-bottom d-md-none sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center text-primary fw-semibold" href="#">
+                <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}" alt="Logo" height="28"
+                    class="me-2">
+                SeniaMaps
+            </a>
+            <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas"
+                data-bs-target="#sidebarMobile">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarMobile">
+
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title text-primary fw-semibold">SeniaMaps</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body p-0">
+            <div th:replace="~{fragments/sidebar :: sidebar('home')}"></div>
         </div>
 
     </div>
 
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+
+            <!-- ===== SIDEBAR FIJA (desktop) ===== -->
+            <aside
+                class="col-md-3 col-lg-2 d-none d-md-flex flex-column bg-white border-end shadow-sm p-0 position-sticky top-0"
+                style="height:100vh;">
+
+                <div th:replace="fragments/sidebar :: sidebar('home')"></div>
+
+            </aside>
+
+            <!-- ===== MAIN ===== -->
+            <main class="col-12 col-md-9 col-lg-10 py-4 px-3 px-md-4">
+
+                <!-- Cabecera -->
+                <div class="mb-4">
+                    <h1 class="h3 fw-semibold text-primary mb-1">
+                        Bienvenido, <span sec:authentication="name" class="text-dark"></span>
+                    </h1>
+                    <p class="text-muted mb-0">Busca negocios cercanos usando Geoapify</p>
+                </div>
+
+                <!-- Tarjeta búsqueda -->
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-3">
+                        <h2 class="h5 fw-semibold mb-0 text-primary">
+                            <i class="bi bi-search me-2"></i> Buscar negocios
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="form-busqueda" class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="campo-busqueda" class="form-label small text-muted">Palabra clave</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i
+                                            class="bi bi-shop text-primary"></i></span>
+                                    <input id="campo-busqueda" type="text" class="form-control"
+                                        placeholder="Ej: cafetería, farmacia..." required>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="custom-radius" class="form-label small text-muted">Radio (km)</label>
+                                <input id="custom-radius" type="number" min="1" max="50" value="5" class="form-control">
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label for="custom-limit" class="form-label small text-muted">Nº resultados</label>
+                                <input id="custom-limit" type="number" min="1" max="50" value="10" class="form-control">
+                            </div>
+                            <div class="col-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary shadow-none px-4">
+                                    <i class="bi bi-search me-1"></i> Buscar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Estado / loading -->
+                        <div id="status" class="mt-3 small text-muted d-flex align-items-center gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                <div id="resultados" class="row g-3"></div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div id="appToast" class="toast align-items-center text-bg-primary border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body" id="appToastBody">Acción realizada.</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL CONFIRMACIÓN GENÉRICO ===== -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-3 border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title text-primary"><i class="bi bi-question-circle me-2"></i>Confirmar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="confirmModalBody">¿Continuar con la acción?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary shadow-none"
+                        data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary shadow-none" id="confirmModalOk">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <script th:inline="javascript">
+        /*<![CDATA[*/
+        const urlSearch = /*[[@{/api/places}]]*/ '/api/places';
 
-        const urlSearch =
-            /*[[@{/api/places}]]*/ '/api/places';
+        // ---------- Helpers UI ----------
+        function showToast(message, variant = 'primary') {
+            const toastEl = document.getElementById('appToast');
+            toastEl.className = `toast align-items-center text-bg-${variant} border-0`;
+            document.getElementById('appToastBody').textContent = message;
+            bootstrap.Toast.getOrCreateInstance(toastEl).show();
+        }
 
-        document.getElementById('form-busqueda')
-            .addEventListener('submit', async function (e) {
+        function confirmAction(message, onConfirm) {
+            document.getElementById('confirmModalBody').textContent = message;
+            const modalEl = document.getElementById('confirmModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            const okBtn = document.getElementById('confirmModalOk');
+            const handler = () => { okBtn.removeEventListener('click', handler); modal.hide(); onConfirm(); };
+            okBtn.addEventListener('click', handler);
+            modal.show();
+        }
 
-                e.preventDefault();
+        // ---------- Búsqueda ----------
+        document.getElementById('form-busqueda').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const keyword = document.getElementById('campo-busqueda').value;
+            const status = document.getElementById('status');
+            const radius = parseFloat(document.getElementById('custom-radius').value) * 1000;
+            const limit = document.getElementById('custom-limit').value;
 
-                const keyword =
-                    document.getElementById('campo-busqueda').value;
+            status.innerHTML = `<div class="spinner-border spinner-border-sm text-primary" role="status"></div> Realizando búsqueda...`;
 
-                const status =
-                    document.getElementById('status');
-
-                let radiusKm =
-                    document.getElementById('custom-radius').value;
-
-                let limit =
-                    document.getElementById('custom-limit').value;
-
-                const radius =
-                    parseFloat(radiusKm) * 1000;
-
-                status.innerHTML =
-                    '<i class="bi bi-arrow-repeat"></i> Realizando búsqueda...';
-
-                navigator.geolocation.getCurrentPosition(
-
-                    async function (position) {
-
-                        const lat = position.coords.latitude;
-
-                        const lon = position.coords.longitude;
-
-                        try {
-
-                            const response = await fetch(
-                                `${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`
-                            );
-
-                            if (response.status === 401 || response.redirected) {
-
-                                alert("Su sesión ha expirado.");
-
-                                window.location.href = "/login";
-
-                                return;
-                            }
-
-                            if (!response.ok) {
-
-                                throw new Error(`Error ${response.status}`);
-
-                            }
-
-                            const data =
-                                await response.json();
-
-                            mostrarResultados(data);
-
-                            status.innerHTML =
-                                `<i class="bi bi-check-circle-fill text-success"></i>
-                                Búsqueda completada:
-                                ${data.features.length} resultados`;
-
-                        }
-
-                        catch (err) {
-
-                            console.error(err);
-
-                            status.innerHTML =
-                                `<i class="bi bi-exclamation-triangle-fill text-danger"></i>
-                                Error al realizar la búsqueda.`;
-
-                            alert("Ocurrió un error.");
-
-                        }
-
-                    },
-
-                    function () {
-
-                        status.innerHTML =
-                            `<i class="bi bi-geo-alt-fill text-danger"></i>
-                            Error de geolocalización.`;
-
-                        alert("No se pudo obtener la ubicación actual.");
-
+            navigator.geolocation.getCurrentPosition(async function (position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                try {
+                    const response = await fetch(`${urlSearch}?lat=${lat}&lon=${lon}&keyword=${encodeURIComponent(keyword)}&radius=${radius}&limit=${limit}`);
+                    if (response.status === 401 || response.redirected) {
+                        showToast("Su sesión ha expirado.", "danger");
+                        window.location.href = "/login";
+                        return;
                     }
-
-                );
-
+                    if (!response.ok) throw new Error(`Error ${response.status}`);
+                    const data = await response.json();
+                    mostrarResultados(data);
+                    status.innerHTML = `<i class="bi bi-check-circle text-success"></i> Búsqueda completada: ${data.features.length} resultados`;
+                } catch (err) {
+                    console.error(err);
+                    status.innerHTML = `<i class="bi bi-exclamation-triangle text-danger"></i> Error al realizar la búsqueda.`;
+                    showToast("Ocurrió un error en la búsqueda.", "danger");
+                }
+            }, function () {
+                status.innerHTML = `<i class="bi bi-exclamation-triangle text-danger"></i> Error de geolocalización.`;
+                showToast("No se pudo obtener la ubicación actual.", "danger");
             });
+        });
 
+        // ---------- Render Cards ----------
         function mostrarResultados(data) {
-
-            const contenedor =
-                document.getElementById("resultados");
-
+            const contenedor = document.getElementById("resultados");
             contenedor.innerHTML = "";
 
             data.features.forEach(f => {
-
                 const p = f.properties || {};
+                const idLugar = p.place_id;
+                const nombre = (p.name || "Sin nombre").replace(/"/g, '&quot;');
+                const direccion = (p.formatted || "Sin dirección").replace(/"/g, '&quot;');
+                const userRating = p.userRating ?? null;
+                const isFavorite = p.enFavorito === true;
 
-                const idLugar =
-                    p.place_id;
+                const ratingBadge = userRating !== null
+                    ? `<span id="badge-rating-${idLugar}" class="badge bg-success ms-2">⭐ ${userRating}</span>`
+                    : `<span id="badge-rating-${idLugar}"></span>`;
 
-                const nombre =
-                    p.name || "Sin nombre";
-
-                const direccion =
-                    p.formatted || "Sin dirección";
-
-                const userRating =
-                    p.userRating ?? null;
-
-                const isFavorite =
-                    p.enFavorito === true;
-
-                const ratingBadge =
-                    userRating !== null
-                        ? `<span class="badge bg-success"
-                            id="badge-rating-${idLugar}">
-                            ⭐ ${userRating}
-                        </span>`
-                        : '';
-
-                const favoriteButtonClass =
-                    isFavorite
-                        ? 'btn-success'
-                        : 'btn-outline-warning';
-
-                const favoriteButtonText =
-                    isFavorite
-                        ? 'Guardado'
-                        : 'Añadir';
-
-                const favoriteButtonIcon =
-                    isFavorite
-                        ? 'bi-star-fill'
-                        : 'bi-star';
+                const favClass = isFavorite ? 'btn-warning text-white' : 'btn-outline-warning';
+                const favText = isFavorite ? 'Guardado' : 'Añadir';
+                const favIcon = isFavorite ? 'bi-star-fill' : 'bi-star';
 
                 contenedor.innerHTML += `
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm rounded-3 card-hover">
+                    <div class="card-body d-flex flex-column p-3">
 
-<div class="col-md-6 col-xl-4">
-
-    <div class="card h-100 shadow-sm border-0 rounded-4">
-
-        <div class="card-body d-flex flex-column">
-
-            <div class="mb-3">
-
-                <h5 class="fw-bold mb-2">
-
-                    <i class="bi bi-shop text-primary"></i>
-
-                    ${nombre}
-
-                </h5>
-
-                <p class="text-muted small mb-0">
-
-                    ${direccion}
-
-                </p>
-
-            </div>
-
-            <hr>
-
-            <div class="row g-3 mt-auto">
-
-                <div class="col-12 col-lg-6">
-
-                    <div class="p-3 border rounded-3 bg-light h-100 d-flex flex-column">
-
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-
-                            <span class="fw-semibold small">
-
-                                <i class="bi bi-star-fill text-warning"></i>
-
-                                Rating
-
-                            </span>
-
-                            ${ratingBadge}
-
+                        <!-- Info arriba -->
+                        <div class="mb-3">
+                            <h3 class="h6 fw-semibold text-primary mb-1">
+                                <i class="bi bi-geo-alt-fill me-1"></i>${nombre}
+                            </h3>
+                            <p class="small text-muted mb-0">${direccion}</p>
                         </div>
 
-                        <input type="number"
-                            min="0"
-                            max="5"
-                            step="0.1"
-                            class="form-control form-control-sm mb-2"
-                            id="rating-${idLugar}"
-                            placeholder="0 - 5">
+                        <!-- Footer grid: abajo izquierda rating, abajo derecha favoritos -->
+                        <div class="mt-auto row g-2 align-items-end">
 
-                        <button class="btn btn-outline-primary btn-sm w-100 mt-auto"
-                            onclick="enviarRating('${idLugar}')">
+                            <!-- Rating (izquierda) -->
+                            <div class="col-6">
+                                <label class="form-label small text-muted mb-1">
+                                    <i class="bi bi-star-half text-warning"></i> Rating
+                                    ${ratingBadge}
+                                </label>
+                                <div class="input-group input-group-sm">
+                                    <input id="rating-${idLugar}" type="number" step="0.1" min="0" max="5" class="form-control" placeholder="0-5">
+                                    <button class="btn btn-primary shadow-none" type="button" onclick="enviarRating('${idLugar}')">
+                                        Guardar
+                                    </button>
+                                </div>
+                            </div>
 
-                            Guardar
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="col-12 col-lg-6">
-
-                    <div class="p-3 border rounded-3 bg-light h-100 d-flex flex-column">
-
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-
-                            <span class="fw-semibold small">
-
-                                <i class="bi bi-star text-warning"></i>
-
-                                Favoritos
-
-                            </span>
+                            <!-- Favorito (derecha) -->
+                            <div class="col-6 text-end">
+                                <label class="form-label small text-muted mb-1 d-block">
+                                    <i class="bi bi-star-fill text-warning"></i> Favoritos
+                                </label>
+                                <button id="btn-fav-${idLugar}" class="btn btn-sm w-100 shadow-none ${favClass}"
+                                        onclick="addFavorito('${idLugar}','${nombre}','${direccion}')"
+                                        ${isFavorite ? 'disabled' : ''}>
+                                    <i class="bi ${favIcon} me-1"></i>${favText}
+                                </button>
+                            </div>
 
                         </div>
-
-                        <button class="btn btn-sm w-100 mt-auto ${favoriteButtonClass}"
-                            id="btn-fav-${idLugar}"
-                            ${isFavorite ? 'disabled' : ''}
-                            onclick="addFavorito('${idLugar}', '${nombre}', '${direccion}')">
-
-                            <i class="bi ${favoriteButtonIcon}"></i>
-
-                            ${favoriteButtonText}
-
-                        </button>
-
                     </div>
-
                 </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-`;
+            </div>`;
             });
-
         }
 
+        // ---------- Rating ----------
         async function enviarRating(idLugar) {
-
-            const input =
-                document.getElementById(`rating-${idLugar}`);
-
-            const rating =
-                parseFloat(input.value);
-
+            const input = document.getElementById(`rating-${idLugar}`);
+            const rating = parseFloat(input.value);
             if (isNaN(rating) || rating < 0 || rating > 5) {
-
-                alert("Introduce un rating válido.");
-
+                showToast("Introduce un rating válido (0-5).", "danger");
                 return;
-
             }
 
-            const formData =
-                new URLSearchParams();
-
+            const formData = new URLSearchParams();
             formData.append("idLugar", idLugar);
-
             formData.append("rating", rating);
 
             try {
-
                 const response = await fetch("/rating/guardar", {
-
                     method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/x-www-form-urlencoded"
-                    },
-
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: formData
-
                 });
-
                 if (response.status === 401 || response.redirected) {
-
-                    alert("Sesión expirada.");
-
+                    showToast("Sesión expirada.", "danger");
                     window.location.href = "/login";
-
                     return;
-
                 }
-
-                let badge =
-                    document.getElementById(`badge-rating-${idLugar}`);
-
-                if (!badge) {
-
-                    const container =
-                        document.querySelector(`#rating-${idLugar}`)
-                            .parentElement
-                            .querySelector('.d-flex');
-
-                    badge = document.createElement("span");
-
-                    badge.id = `badge-rating-${idLugar}`;
-
-                    badge.className = "badge bg-success";
-
-                    container.appendChild(badge);
-
+                let badge = document.getElementById(`badge-rating-${idLugar}`);
+                if (badge) {
+                    badge.className = "badge bg-success ms-2";
+                    badge.innerHTML = `⭐ ${rating}`;
                 }
-
-                badge.innerHTML = `⭐ ${rating}`;
-
                 input.value = "";
-
-            }
-
-            catch (err) {
-
+                showToast("Rating guardado correctamente.", "success");
+            } catch (err) {
                 console.error(err);
-
-                alert("Error al guardar rating.");
-
+                showToast("Error al guardar el rating.", "danger");
             }
-
         }
 
+        // ---------- Favoritos (con modal de confirmación) ----------
         function addFavorito(idLugar, nombre, direccion) {
-
-            fetch('/favoritos/agregar', {
-
-                method: 'POST',
-
-                headers: {
-                    'Content-Type':
-                        'application/x-www-form-urlencoded'
-                },
-
-                body: new URLSearchParams({
-
-                    idLugar: idLugar,
-
-                    nombre: nombre,
-
-                    direccion: direccion || ''
-
+            confirmAction(`¿Añadir "${nombre}" a tus favoritos?`, () => {
+                fetch('/favoritos/agregar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ idLugar, nombre, direccion: direccion || '' })
                 })
-
-            })
-
-                .then(res => {
-
-                    if (res.status === 401 || res.redirected) {
-
-                        alert("Sesión expirada.");
-
-                        window.location.href = "/login";
-
-                        return;
-
-                    }
-
-                    return res.text();
-
-                })
-
-                .then(data => {
-
-                    if (!data) return;
-
-                    const btn =
-                        document.getElementById(`btn-fav-${idLugar}`);
-
-                    if (data === 'OK' || data === 'YA_EXISTE') {
-
-                        btn.className =
-                            "btn btn-sm w-100 mt-auto btn-success";
-
-                        btn.innerHTML =
-                            `<i class="bi bi-star-fill"></i> Guardado`;
-
-                        btn.disabled = true;
-
-                    }
-
-                    else {
-
-                        alert('Error al añadir');
-
-                    }
-
-                })
-
-                .catch(() => {
-
-                    alert('Error de red');
-
-                });
-
+                    .then(res => {
+                        if (res.status === 401 || res.redirected) {
+                            showToast("Sesión expirada.", "danger");
+                            window.location.href = "/login";
+                            return;
+                        }
+                        return res.text();
+                    })
+                    .then(data => {
+                        if (!data) return;
+                        const btn = document.getElementById(`btn-fav-${idLugar}`);
+                        if (data === 'OK' || data === 'YA_EXISTE') {
+                            btn.className = "btn btn-sm w-100 shadow-none btn-warning text-white";
+                            btn.innerHTML = `<i class="bi bi-star-fill me-1"></i>Guardado`;
+                            btn.disabled = true;
+                            showToast("Añadido a favoritos.", "success");
+                        } else {
+                            showToast("Error al añadir a favoritos.", "danger");
+                        }
+                    })
+                    .catch(() => showToast("Error de red.", "danger"));
+            });
         }
-
+        /*]]>*/
     </script>
 
 </body>

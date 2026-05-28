@@ -1,0 +1,56 @@
+<div th:fragment="sidebar(activePage)" class="h-100 d-flex flex-column">
+
+    <!-- HEADER -->
+    <div class="p-3 border-bottom d-flex align-items-center gap-2">
+        <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}" height="32">
+        <span class="fs-5 fw-semibold text-primary">SeniaMaps</span>
+    </div>
+
+    <!-- USER -->
+    <div class="px-3 py-2 small text-muted border-bottom">
+        <i class="bi bi-person-circle me-1 text-primary"></i>
+        <span sec:authentication="name">Usuario</span>
+    </div>
+
+    <!-- NAV -->
+    <nav class="nav flex-column p-2 gap-1 flex-grow-1">
+
+        <a class="nav-link rounded px-3 py-2 d-flex align-items-center"
+            th:classappend="${activePage == 'home'} ? 'active bg-primary-subtle text-primary fw-semibold'"
+            th:href="@{/home}">
+            <i class="bi bi-house-door me-2"></i> Inicio
+        </a>
+
+        <a class="nav-link rounded px-3 py-2 d-flex align-items-center"
+            th:classappend="${activePage == 'history'} ? 'active bg-primary-subtle text-primary fw-semibold'"
+            th:href="@{/history}">
+            <i class="bi bi-clock-history me-2"></i> Historial
+        </a>
+
+        <a class="nav-link rounded px-3 py-2 d-flex align-items-center"
+            th:classappend="${activePage == 'favoritos'} ? 'active bg-primary-subtle text-primary fw-semibold'"
+            th:href="@{/favoritos}">
+            <i class="bi bi-star me-2"></i> Mis Favoritos
+        </a>
+
+        <a class="nav-link rounded px-3 py-2 d-flex align-items-center"
+            th:classappend="${activePage == 'etiquetas'} ? 'active bg-primary-subtle text-primary fw-semibold'"
+            th:href="@{/etiquetas}">
+            <i class="bi bi-tags me-2"></i> Gestionar Etiquetas
+        </a>
+
+        <a class="nav-link rounded px-3 py-2 d-flex align-items-center"
+            th:classappend="${activePage == 'settings'} ? 'active bg-primary-subtle text-primary fw-semibold'"
+            th:href="@{/settings}">
+            <i class="bi bi-gear me-2"></i> Configuración
+        </a>
+        <!-- LOGOUT (AHORA ARRIBA) -->
+        <div class="p-2 border-bottom">
+            <a class="nav-link text-danger rounded px-3 py-2 d-flex align-items-center" th:href="@{/logout}">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Cerrar sesión
+            </a>
+        </div>
+    </nav>
+
+</div>
