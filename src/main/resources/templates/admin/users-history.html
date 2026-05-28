@@ -13,7 +13,6 @@
 
 <body class="bg-light">
 
-    <!-- NAVBAR MÓVIL -->
     <nav class="navbar navbar-expand-md bg-white border-bottom d-md-none">
 
         <div class="container-fluid">
@@ -47,13 +46,11 @@
 
         <div class="row min-vh-100">
 
-            <!-- SIDEBAR -->
             <aside class="col-md-3 col-lg-2 collapse d-md-block bg-white border-end"
                    id="sidebarMenu">
 
                 <div class="p-4 d-flex flex-column h-100">
 
-                    <!-- LOGO -->
                     <div class="mb-4 d-none d-md-flex align-items-center">
 
                         <img th:src="@{/Logo_azul_degradado_FV_2lineas_FV_logo_v3_2lineas.svg}"
@@ -67,7 +64,6 @@
 
                     </div>
 
-                    <!-- USER -->
                     <div class="card border-0 bg-light mb-4">
 
                         <div class="card-body">
@@ -88,7 +84,6 @@
 
                     </div>
 
-                    <!-- MENU -->
                     <div class="nav nav-pills flex-column gap-2">
 
                         <a href="/admin/dashboard"
@@ -125,7 +120,6 @@
 
                     </div>
 
-                    <!-- LOGOUT -->
                     <div class="mt-auto pt-4">
 
                         <a href="/logout"
@@ -142,10 +136,8 @@
 
             </aside>
 
-            <!-- MAIN CONTENT -->
             <main class="col-md-9 col-lg-10 p-4 p-lg-5">
 
-                <!-- HEADER -->
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
 
                     <div>
@@ -160,7 +152,6 @@
 
                     </div>
 
-                    <!-- FILTERS -->
                     <div class="btn-group">
 
                         <a th:href="@{/admin/users(rol='ALL')}"
@@ -191,7 +182,6 @@
 
                 </div>
 
-                <!-- ALERTAS -->
                 <div th:if="${param.success != null and param.success[0] == 'rol'}"
                      class="alert alert-success d-flex align-items-center">
 
@@ -228,7 +218,6 @@
 
                 </div>
 
-                <!-- TABLE CARD -->
                 <div class="card border-0 shadow-sm">
 
                     <div class="card-body p-0">
@@ -242,29 +231,12 @@
 
                                     <tr>
 
-                                        <th class="px-4 py-3">
-                                            ID
-                                        </th>
-
-                                        <th class="py-3">
-                                            Usuario
-                                        </th>
-
-                                        <th class="py-3">
-                                            Rol
-                                        </th>
-
-                                        <th class="py-3">
-                                            Modificar rol
-                                        </th>
-
-                                        <th class="py-3">
-                                            Cambiar contraseña
-                                        </th>
-
-                                        <th class="py-3 text-center">
-                                            Eliminar
-                                        </th>
+                                        <th class="px-4 py-3">ID</th>
+                                        <th class="py-3">Usuario</th>
+                                        <th class="py-3">Rol</th>
+                                        <th class="py-3">Modificar rol</th>
+                                        <th class="py-3">Cambiar contraseña</th>
+                                        <th class="py-3 text-center">Eliminar</th>
 
                                     </tr>
 
@@ -274,123 +246,69 @@
 
                                     <tr th:each="Usuario1 : ${usuarios}">
 
-                                        <!-- ID -->
-                                        <td class="px-4 fw-semibold"
-                                            th:text="${Usuario1.idUsuario}">
-                                        </td>
+                                        <td class="px-4 fw-semibold" th:text="${Usuario1.idUsuario}"></td>
+                                        <td th:text="${Usuario1.username}"></td>
 
-                                        <!-- USERNAME -->
-                                        <td th:text="${Usuario1.username}">
-                                        </td>
-
-                                        <!-- ROL -->
                                         <td>
+                                            <span th:if="${Usuario1.rol == 'ROLE_ADMIN'}" class="badge text-bg-danger">ADMIN</span>
+                                            <span th:if="${Usuario1.rol != 'ROLE_ADMIN'}" class="badge text-bg-success">USER</span>
+                                        </td>
 
-                                            <span th:if="${Usuario1.rol == 'ROLE_ADMIN'}"
-                                                  class="badge text-bg-danger">
-
-                                                ADMIN
-
+                                        <td>
+                                            <span th:if="${Usuario1.idUsuario == 1}" class="text-muted small fw-bold">
+                                                <i class="bi bi-lock-fill text-danger me-1"></i> Protegido
                                             </span>
 
-                                            <span th:if="${Usuario1.rol != 'ROLE_ADMIN'}"
-                                                  class="badge text-bg-success">
-
-                                                USER
-
-                                            </span>
-
-                                        </td>
-
-                                        <!-- CAMBIAR ROL -->
-                                        <td>
-
-                                            <form th:action="@{/admin/users/cambiar-rol}"
+                                            <form th:unless="${Usuario1.idUsuario == 1}" 
+                                                  th:action="@{/admin/users/cambiar-rol}"
                                                   method="POST"
                                                   class="d-flex gap-2 flex-wrap">
 
-                                                <input type="hidden"
-                                                       name="id"
-                                                       th:value="${Usuario1.idUsuario}" />
+                                                <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
 
-                                                <select name="nuevoRol"
-                                                        class="form-select form-select-sm">
-
-                                                    <option value="ROLE_USER"
-                                                            th:selected="${Usuario1.rol == 'ROLE_USER'}">
-
-                                                        USER
-
-                                                    </option>
-
-                                                    <option value="ROLE_ADMIN"
-                                                            th:selected="${Usuario1.rol == 'ROLE_ADMIN'}">
-
-                                                        ADMIN
-
-                                                    </option>
-
+                                                <select name="nuevoRol" class="form-select form-select-sm">
+                                                    <option value="ROLE_USER" th:selected="${Usuario1.rol == 'ROLE_USER'}">USER</option>
+                                                    <option value="ROLE_ADMIN" th:selected="${Usuario1.rol == 'ROLE_ADMIN'}">ADMIN</option>
                                                 </select>
 
-                                                <button type="submit"
-                                                        class="btn btn-success btn-sm">
-
-                                                    Guardar
-
-                                                </button>
-
+                                                <button type="submit" class="btn btn-success btn-sm">Guardar</button>
                                             </form>
-
                                         </td>
 
-                                        <!-- PASSWORD -->
                                         <td>
+                                            <span th:if="${Usuario1.idUsuario == 1}" class="text-muted small fw-bold">
+                                                <i class="bi bi-lock-fill text-danger me-1"></i> Protegido
+                                            </span>
 
-                                            <form th:action="@{/admin/users/cambiar-password}"
+                                            <form th:unless="${Usuario1.idUsuario == 1}"
+                                                  th:action="@{/admin/users/cambiar-password}"
                                                   method="POST"
                                                   class="d-flex gap-2 flex-wrap">
 
-                                                <input type="hidden"
-                                                       name="id"
-                                                       th:value="${Usuario1.idUsuario}" />
-
-                                                <input type="password"
-                                                       name="nuevaPassword"
-                                                       placeholder="Nueva clave"
-                                                       class="form-control form-control-sm"
-                                                       required>
-
-                                                <button type="submit"
-                                                        class="btn btn-outline-success btn-sm">
-
-                                                    Cambiar
-
-                                                </button>
-
+                                                <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
+                                                <input type="password" name="nuevaPassword" placeholder="Nueva clave" class="form-control form-control-sm" required>
+                                                <button type="submit" class="btn btn-outline-success btn-sm">Cambiar</button>
                                             </form>
-
                                         </td>
 
-                                        <!-- ELIMINAR -->
                                         <td class="text-center">
+                                            <span th:if="${Usuario1.idUsuario == 1}" class="text-muted small">
+                                                <i class="bi bi-shield-lock-fill text-danger fs-5"></i>
+                                            </span>
 
-                                            <form th:action="@{/admin/users/eliminar}"
-                                                  method="POST"
-                                                  th:onsubmit="return confirm('¿Seguro que deseas eliminar este usuario?')">
+                                            <form th:unless="${Usuario1.idUsuario == 1}"
+                                                  th:id="'form-eliminar-' + ${Usuario1.idUsuario}"
+                                                  th:action="@{/admin/users/eliminar}"
+                                                  method="POST">
 
-                                                <input type="hidden"
-                                                       name="id"
-                                                       th:value="${Usuario1.idUsuario}" />
+                                                <input type="hidden" name="id" th:value="${Usuario1.idUsuario}" />
 
-                                                <button type="submit"
-                                                        class="btn btn-outline-danger btn-sm">
-
+                                                <button type="button" 
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        th:onclick="prepararEliminado([[${Usuario1.idUsuario}]])">
                                                     <i class="bi bi-trash"></i>
-
                                                 </button>
-
                                             </form>
-
                                         </td>
 
                                     </tr>
@@ -401,14 +319,9 @@
 
                         </div>
 
-                        <!-- EMPTY -->
-                        <div th:if="${#lists.isEmpty(usuarios)}"
-                             class="text-center p-5 text-muted">
-
+                        <div th:if="${#lists.isEmpty(usuarios)}" class="text-center p-5 text-muted">
                             <i class="bi bi-people fs-1 d-block mb-3"></i>
-
                             No se encontraron usuarios
-
                         </div>
 
                     </div>
@@ -421,7 +334,6 @@
 
     </div>
 
-    <!-- MODAL -->
     <div class="modal fade"
          id="confirmModal"
          tabindex="-1"
@@ -432,41 +344,17 @@
             <div class="modal-content border-0">
 
                 <div class="modal-header">
-
-                    <h5 class="modal-title">
-                        Confirmar acción
-                    </h5>
-
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
-                    </button>
-
+                    <h5 class="modal-title">Confirmar acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-
-                    ¿Deseas continuar con esta acción?
-
+                    ¿Seguro que deseas eliminar este usuario? Esta acción no se puede deshacer.
                 </div>
 
                 <div class="modal-footer">
-
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-
-                        Cancelar
-
-                    </button>
-
-                    <button type="button"
-                            class="btn btn-success">
-
-                        Confirmar
-
-                    </button>
-
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btn-confirmar-eliminar" class="btn btn-danger">Confirmar</button>
                 </div>
 
             </div>
@@ -475,23 +363,34 @@
 
     </div>
 
-    <!-- SPINNER -->
     <div class="d-none position-fixed top-50 start-50 translate-middle"
          id="loadingSpinner"
          style="z-index: 9999;">
 
-        <div class="spinner-border text-success"
-             role="status">
-
-            <span class="visually-hidden">
-                Loading...
-            </span>
-
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
 
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let idUsuarioAEliminar = null;
+        const modalConfirmacion = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+        function prepararEliminado(id) {
+            idUsuarioAEliminar = id;
+            modalConfirmacion.show();
+        }
+
+        document.getElementById('btn-confirmar-eliminar').addEventListener('click', function() {
+            if (idUsuarioAEliminar !== null) {
+                // Envía de forma nativa el formulario correspondiente al usuario seleccionado
+                document.getElementById('form-eliminar-' + idUsuarioAEliminar).submit();
+            }
+        });
+    </script>
 
 </body>
 
