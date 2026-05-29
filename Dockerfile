@@ -1,5 +1,5 @@
 # Paso 2: Usar una imagen ligera de Java para ejecutar la aplicación
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Copiar el .jar empaquetado desde el paso anterior
