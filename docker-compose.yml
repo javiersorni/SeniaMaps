@@ -32,9 +32,39 @@ services:
       - db
     networks:
       - seniamaps-net
+  nginx:
+    image: nginx:latest
+    container_name: seniamaps-nginx
+    restart: always
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+
+    depends_on:
+      - web
+
+    networks:
+      - seniamaps-net
+
+  certbot:
+    image: certbot/certbot
+    container_name: seniamaps-certbot
+
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+
+    networks:
+      - seniamaps-net
 
 volumes:
-  mysql_data: # Evita que los datos de la BD se borren al apagar el contenedor
+  mysql_data:
 
 networks:
-  seniamaps-net: # Red interna para que se comuniquen entre ellos
+  seniamaps-net:
