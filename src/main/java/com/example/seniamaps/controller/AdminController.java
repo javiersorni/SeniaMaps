@@ -38,16 +38,7 @@ public class AdminController {
         this.busquedaRepository = busquedaRepository;
     }
 
-    /*
-     * =====================================================
-     * UPDATE ADMIN SETTINGS
-     * =====================================================
-     */
-/*
-     * =====================================================
-     * UPDATE ADMIN SETTINGS (Corregido)
-     * =====================================================
-     */
+     //UPDATE ADMIN SETTINGS
     @PostMapping("/settings/update")
     public String actualizarPerfilAdmin(
             @RequestParam String username,
@@ -78,11 +69,10 @@ public class AdminController {
                 return "redirect:/logout"; 
             }
             
-            // Si solo cambió el nombre, guardamos aquí
+            //Si solo cambió el nombre, guardamos aquí
             usuarioRepository.save(admin);
             
-            // === 🚀 CLAVE: ACTUALIZAR LA SESIÓN EN SPRING SECURITY ===
-            // Creamos un nuevo token de autenticación con el nuevo nombre y las mismas credenciales/roles
+            //Creamos un nuevo token de autenticación con el nuevo nombre y las mismas credenciales/roles
             org.springframework.security.core.Authentication authActual = 
                     SecurityContextHolder.getContext().getAuthentication();
             
@@ -93,7 +83,7 @@ public class AdminController {
                             authActual.getAuthorities()
                     );
             
-            // Reemplazamos la credencial vieja por la nueva en el contexto de la app
+            //Reemplazamos la credencial vieja por la nueva en el contexto de la app
             SecurityContextHolder.getContext().setAuthentication(nuevaAuth);
             // =========================================================
             
@@ -106,11 +96,7 @@ public class AdminController {
         }
     }
 
-    /*
-     * =====================================================
-     * ADMIN DASHBOARD
-     * =====================================================
-     */
+    //ADMIN DASHBOARD
     @GetMapping("/home")
     public String adminHome() {
         return "admin/dashboard";
@@ -132,7 +118,6 @@ public class AdminController {
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setUsername(username);
             nuevoUsuario.setEmail(email);
-            // Recuerda encriptar la password aquí si usas PasswordEncoder:
             nuevoUsuario.setPassword(passwordEncoder.encode(password)); 
             nuevoUsuario.setRol(rol);
             
@@ -185,22 +170,21 @@ public class AdminController {
         
         return "admin/users-history";
     }
-    @GetMapping("/settings") // O la ruta que estés usando para settings
+    @GetMapping("/settings")
     public String verAjustes(Model model, Principal principal) {
         
-        // 1. Conseguir el username del usuario que está logueado en la app
+        //1.Conseguir el username del usuario que está logueado en la app
         String usernameLogueado = principal.getName();
         
-        // 2. Buscarlo en tu repositorio de usuarios
+        //2.Buscarlo en tu repositorio de usuarios
         Usuario admin = usuarioRepository.findByUsername(usernameLogueado)
                             .orElseThrow(() -> new RuntimeException("Admin no encontrado"));
         
-        // 3. ¡ESTA LÍNEA ES LA QUE FALTA! Añadirlo al modelo con el nombre exacto "admin"
+        //3.Añadirlo al modelo con el nombre exacto "admin"
         model.addAttribute("admin", admin);
         
         return "admin/settings";
     }
-    // Cambiar el Rol de un usuario
     @PostMapping("/users/cambiar-rol")
     public String cambiarRol(@RequestParam("id") Long id, 
                             @RequestParam("nuevoRol") String nuevoRol,
@@ -210,12 +194,10 @@ public class AdminController {
         
         usuario.setRol(nuevoRol);
         usuarioRepository.save(usuario);
-        
-        // Redirige manteniendo el filtro por el que iba el administrador
+
         return "redirect:/admin/users?rol=" + rolSeleccionado + "&success=rol";
     }
 
-    // Cambiar la Contraseña de un usuario
     @PostMapping("/users/cambiar-password")
     public String cambiarPassword(@RequestParam("id") Long id, 
                                 @RequestParam("nuevaPassword") String nuevaPassword,
@@ -232,12 +214,10 @@ public class AdminController {
         
         return "redirect:/admin/users?rol=" + rolSeleccionado + "&success=password";
     }
-    // Eliminar un usuario definitivamente
     @PostMapping("/users/eliminar")
     public String eliminarUsuario(@RequestParam("id") Long id,
                                 @RequestParam(value = "rolSeleccionado", defaultValue = "ALL") String rolSeleccionado) {
         
-        // Comprobamos si existe antes de borrar para evitar excepciones
         if (!usuarioRepository.existsById(id)) {
             return "redirect:/admin/users?rol=" + rolSeleccionado + "&error=no-existe";
         }

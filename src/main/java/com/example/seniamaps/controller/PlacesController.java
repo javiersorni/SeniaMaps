@@ -49,8 +49,7 @@ public class PlacesController {
                         @RequestParam(defaultValue = "3000") int radius,
                         @RequestParam(defaultValue = "20") int limit) {
 
-                // 🛡️ CONTROL DE SEGURIDAD INTERCEPTOR: Evita el NullPointerException si la
-                // sesión expira
+                //Evita el NullPointerException si la sesión expira
                 if (user == null) {
                         throw new ResponseStatusException(
                                         HttpStatus.UNAUTHORIZED,
@@ -80,7 +79,7 @@ public class PlacesController {
                 // 1. Guardar resultados en BD
                 resultadoService.saveResults(response.getFeatures(), busqueda);
 
-                // 2. ENRIQUECER ratings del usuario
+                // 2. ratings del usuario
                 resultadoService.enrichRatings(response, usuario);
 
                 favoritosService.enrichFavoritos(response, usuario);

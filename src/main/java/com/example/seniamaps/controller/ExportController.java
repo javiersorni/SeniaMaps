@@ -27,7 +27,6 @@ public class ExportController {
     @GetMapping("/export/csv")
     public void exportCsv(HttpServletResponse response) throws IOException {
 
-        // 🔥 USUARIO LOGUEADO
         org.springframework.security.core.userdetails.User userDetails =
                 (org.springframework.security.core.userdetails.User)
                         SecurityContextHolder.getContext()
@@ -38,11 +37,10 @@ public class ExportController {
                 .findByUsername(userDetails.getUsername())
                 .orElseThrow();
 
-        // 🔥 FAVORITOS DEL USUARIO
         List<FavoritoDTO> favoritos =
                 favoritosService.getFavoritos(usuario);
 
-        // CONFIG CSV
+        //CONFIG CSV
         response.setContentType("text/csv");
         response.setCharacterEncoding("UTF-8");
 
@@ -52,11 +50,9 @@ public class ExportController {
 
         PrintWriter writer = response.getWriter();
 
-        // CABECERA
         writer.println(
                 "ID,Nombre,Direccion,Latitud,Longitud,Rating,Categorias,Etiquetas");
 
-        // FILAS
         for (FavoritoDTO fav : favoritos) {
 
             var dto = fav.getResultado();

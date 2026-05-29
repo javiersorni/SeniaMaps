@@ -26,7 +26,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 🔥 LOGIN
+    //LOGIN
     @GetMapping("/login")
     public String login(Authentication auth) {
 
@@ -39,7 +39,7 @@ public class AuthController {
         return "login";
     }
 
-    // 🔥 REGISTER PAGE
+    //REGISTER PAGE
     @GetMapping("/register")
     public String register(Authentication auth) {
 

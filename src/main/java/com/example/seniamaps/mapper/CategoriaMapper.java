@@ -7,9 +7,6 @@ import java.text.Normalizer;
 @Component
 public class CategoriaMapper {
 
-    /**
-     * Convierte keywords del usuario a categoría Geoapify
-     */
     public String mapToGeoapify(String keyword) {
 
         if (keyword == null || keyword.isBlank()) {
@@ -48,9 +45,6 @@ public class CategoriaMapper {
         };
     }
 
-    /**
-     * Normaliza categorías Geoapify a etiquetas legibles
-     */
     public String clean(String raw) {
 
         if (raw == null || raw.isBlank()) {
@@ -97,9 +91,6 @@ public class CategoriaMapper {
         return "Otros";
     }
 
-    /**
-     * Valida si la categoría pertenece a dominios soportados
-     */
     public boolean isValid(String raw) {
 
         return raw != null && (raw.startsWith("catering.") ||

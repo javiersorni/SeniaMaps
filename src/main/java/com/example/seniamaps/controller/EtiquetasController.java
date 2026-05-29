@@ -24,7 +24,7 @@ public class EtiquetasController {
     private EtiquetaRepository etiquetaRepository;
     
     @Autowired
-    private ResultadoRepository resultadoRepository; // El repositorio de vuestros favoritos
+    private ResultadoRepository resultadoRepository;
 
     // 1. Vista principal y Filtrado por etiqueta
     @GetMapping

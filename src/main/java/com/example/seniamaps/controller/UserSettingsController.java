@@ -47,32 +47,32 @@ public class UserSettingsController {
 
     @PostMapping("/username")
     public String cambiarUsername(@RequestParam("username") String nuevoUsername, 
-                                Principal principal, // <--- Usar Principal es más seguro y directo
+                                Principal principal,
                                 RedirectAttributes redirectAttributes) {
         
-        // 1. Control de seguridad preventiva: Si por lo que sea no hay sesión, redirigir al login
+        //security control
         if (principal == null) {
             return "redirect:/login";
         }
         
-        // 2. Obtener el nombre actual de la sesión de forma segura
+        //obtain name
         String usernameActual = principal.getName();
         
-        // 3. Buscar el usuario en la base de datos
+        //search user
         Usuario usuario = userRepository.findByUsername(usernameActual)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Usuario no encontrado"));
         
-        // 4. Comprobar si el nuevo nombre ya está cogido por OTRA persona
+        //check username
         if (userRepository.existsByUsername(nuevoUsername) && !nuevoUsername.equals(usernameActual)) {
             redirectAttributes.addFlashAttribute("errorUsername", "El nombre de usuario ya está en uso.");
             return "redirect:/settings";
         }
         
-        // 5. Actualizar en la base de datos
+        //update database
         usuario.setUsername(nuevoUsername);
         userRepository.save(usuario);
         
-        // 6. Actualizar el contexto de Spring Security para que la sesión no se rompa
+        //update Spring security
         Authentication nuevaAuth = new UsernamePasswordAuthenticationToken(
                 nuevoUsername, 
                 usuario.getPassword(), 
@@ -80,7 +80,6 @@ public class UserSettingsController {
         );
         SecurityContextHolder.getContext().setAuthentication(nuevaAuth);
         
-        // 7. Todo ha ido bien
         redirectAttributes.addFlashAttribute("exitoUsername", "¡Nombre de usuario actualizado con éxito!");
         return "redirect:/settings";
     }
@@ -91,17 +90,16 @@ public class UserSettingsController {
                 .findByUsername(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Validamos si la contraseña viene vacía para que no guarde un hash en blanco accidentalmente
+        //validate password
         if (password == null || password.trim().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorPassword", "La contraseña no puede estar vacía.");
             return "redirect:/settings";
         }
 
-        // Encriptamos y guardamos la nueva contraseña utilizando tu passwordEncoder
+        //encrypt and save password 
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
 
-        // Al cambiar de contraseña, lo ideal es mandar un flash indicando el cambio
         redirectAttributes.addFlashAttribute("exitoPassword", "Contraseña actualizada correctamente.");
         return "redirect:/settings";
     }

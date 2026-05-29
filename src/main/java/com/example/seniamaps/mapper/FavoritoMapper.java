@@ -26,7 +26,7 @@ public class FavoritoMapper {
 
         Resultado r = favorito.getResultado();
 
-        // DTO del resultado
+        // DTO
         ResultadoDTO resultadoDTO = new ResultadoDTO();
 
         resultadoDTO.setIdResultado(r.getIdResultado());
@@ -59,7 +59,6 @@ public class FavoritoMapper {
             );
         }
 
-        // DTO favorito
         FavoritoDTO dto = new FavoritoDTO();
         dto.setIdFavorito(favorito.getIdFavorito());
         dto.setResultado(resultadoDTO);

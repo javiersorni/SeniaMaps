@@ -41,7 +41,6 @@ public class ResultadoService {
         this.ratingService = ratingService;
     }
 
-    // ✅ ESTE TE FALTABA
     public void saveResults(List<PlaceFeatureDTO> features, Busqueda busqueda) {
 
         if (features == null)
@@ -91,7 +90,6 @@ public class ResultadoService {
             resultado.getCategorias().addAll(categorias);
             resultadoRepository.save(resultado);
 
-            // 🔥 ESTO ES LO QUE TE FALTA
             if (!resultadoBusquedaRepository.existsByBusquedaAndResultado(busqueda, resultado)) {
 
                 ResultadoBusqueda rb = new ResultadoBusqueda();
@@ -104,7 +102,6 @@ public class ResultadoService {
         }
     }
 
-    // ✔️ TU ENRICH CORRECTO
     public void enrichRatings(GeoapifyResponseDTO response, Usuario usuario) {
 
         if (response == null || response.getFeatures() == null)

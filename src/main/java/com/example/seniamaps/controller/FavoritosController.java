@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal; // <-- Importación crucial
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -40,9 +40,7 @@ public class FavoritosController {
         @Autowired
         private ResultadoRatingService resultadoRatingService;
 
-        // =========================
-        // LISTAR FAVORITOS
-        // =========================
+        //LIST FAVOURITES
         @GetMapping
         public String verFavoritos(Model model, Principal principal) {
 
@@ -64,9 +62,7 @@ public class FavoritosController {
                 return "favoritos";
         }
 
-        // =========================
-        // CREAR ETIQUETA
-        // =========================
+        //TAG
         @PostMapping("/etiqueta/add")
         public String añadirEtiqueta(
                         @RequestParam Long idResultado,
@@ -111,9 +107,7 @@ public class FavoritosController {
                 return "redirect:/favoritos";
         }
 
-        // =========================
-        // ELIMINAR FAVORITO
-        // =========================
+        //DELETE
         @PostMapping("/eliminar")
         public String quitarFavorito(
                         @RequestParam Long idFavorito,
@@ -134,9 +128,7 @@ public class FavoritosController {
                 return "redirect:/favoritos?success=deleted";
         }
 
-        // =========================
-        // AGREGAR FAVORITO
-        // =========================
+        //ADD
         @PostMapping("/agregar")
         @ResponseBody
         public String agregarFavorito(

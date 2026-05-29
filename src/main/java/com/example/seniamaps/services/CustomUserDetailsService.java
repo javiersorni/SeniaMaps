@@ -33,7 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         return User.withUsername(user.getUsername())
                 .password(user.getPassword())
 
-                // 🔥 IMPORTANTE: Spring espera roles SIN "ROLE_"
                 .roles(user.getRol().replace("ROLE_", ""))
 
                 .build();
