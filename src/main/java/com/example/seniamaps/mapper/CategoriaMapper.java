@@ -2,6 +2,8 @@ package com.example.seniamaps.mapper;
 
 import org.springframework.stereotype.Component;
 
+import java.text.Normalizer;
+
 @Component
 public class CategoriaMapper {
 
@@ -14,39 +16,33 @@ public class CategoriaMapper {
             return "commercial";
         }
 
-        keyword = keyword.toLowerCase();
+        keyword = normalize(keyword);
 
         return switch (keyword) {
 
-            // RESTAURACIÓN
-            case "pizza", "hamburguesa", "burger", "kebab", "tacos" -> "catering.restaurant";
-            case "cafe", "cafeteria", "coffee" -> "catering.cafe";
-            case "bar", "pub" -> "catering.bar";
+            case "pizza", "hamburguesa", "burger", "kebab", "tacos" ->
+                "catering.restaurant";
 
-            // ALOJAMIENTO
-            case "hotel", "hostal", "hostel", "motel" -> "accommodation.hotel";
-            case "apartamento", "apartment" -> "accommodation.apartment";
+            case "cafe", "cafeteria", "coffee" ->
+                "catering.cafe";
 
-            // SALUD
-            case "hospital", "clinica", "clinic" -> "healthcare.hospital";
-            case "farmacia", "pharmacy" -> "healthcare.pharmacy";
-            case "dentista" -> "healthcare.dentist";
+            case "bar", "pub" ->
+                "catering.bar";
 
-            // OCIO
-            case "cine", "cinema" -> "entertainment.cinema";
-            case "museo", "museum" -> "entertainment.museum";
-            case "parque", "park" -> "leisure.park";
+            case "hotel", "hostal", "hostel", "motel" ->
+                "accommodation.hotel";
 
-            // TRANSPORTE / SERVICIOS
-            case "parking" -> "parking.cars";
-            case "gasolinera", "fuel" -> "service.vehicle.fuel";
+            case "apartamento", "apartment" ->
+                "accommodation.apartment";
 
-            // SUPERMERCADOS / TIENDAS
-            case "mercadona", "lidl", "aldi", "carrefour", "consum", "dia" ->
-                "commercial.supermarket";
+            case "hospital", "clinica", "clinic" ->
+                "healthcare.hospital";
 
-            // FITNESS / DEPORTE
-            case "gimnasio", "gym", "fitness" -> "sport.fitness.gym";
+            case "farmacia", "pharmacy" ->
+                "healthcare.pharmacy";
+
+            case "dentista" ->
+                "healthcare.dentist";
 
             default -> "commercial";
         };
@@ -95,8 +91,8 @@ public class CategoriaMapper {
             return "Alojamiento";
         }
 
-        if (raw.contains("gym") || raw.contains("fitness")) return "Gimnasio";
-
+        if (raw.contains("gym") || raw.contains("fitness"))
+            return "Gimnasio";
 
         return "Otros";
     }
@@ -114,5 +110,15 @@ public class CategoriaMapper {
                 raw.startsWith("leisure.") ||
                 raw.startsWith("parking.") ||
                 raw.startsWith("service."));
+    }
+
+    private String normalize(String text) {
+
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+
+        return normalized
+                .replaceAll("\\p{M}", "")
+                .toLowerCase()
+                .trim();
     }
 }
