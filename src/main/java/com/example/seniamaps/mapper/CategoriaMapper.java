@@ -114,11 +114,14 @@ public class CategoriaMapper {
 
     private String normalize(String text) {
 
-        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
-
-        return normalized
-                .replaceAll("\\p{M}", "")
+        return text
                 .toLowerCase()
+                .replace("á", "a")
+                .replace("é", "e")
+                .replace("í", "i")
+                .replace("ó", "o")
+                .replace("ú", "u")
+                .replace("ü", "u")
                 .trim();
     }
 }
