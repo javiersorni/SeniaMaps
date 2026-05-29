@@ -578,7 +578,7 @@
                 function actualizarFavoritoUI(idLugar) {
 
                     const button = document.querySelector(
-                        `button[onclick*="addFavorito('${idLugar}'"]`
+                        `.js-fav[data-id="${idLugar}"]`
                     );
 
                     if (!button) return;
@@ -590,11 +590,11 @@
                     if (!actions) return;
 
                     actions.innerHTML = `
-            <div class="badge bg-success-subtle text-success rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2">
-                <i class="bi bi-check-circle-fill"></i>
-                En favoritos
-            </div>
-        `;
+        <div class="badge bg-success-subtle text-success rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2">
+            <i class="bi bi-check-circle-fill"></i>
+            En favoritos
+        </div>
+    `;
                 }
 
                 function borrarHistorial() {
