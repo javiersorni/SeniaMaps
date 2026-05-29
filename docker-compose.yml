@@ -18,7 +18,7 @@ services:
 
   # SERVICIO 2: Vuestra aplicación Spring Boot
   web:
-    build: .
+    build: ./backend
     container_name: seniamaps-app
     restart: always
     ports:
