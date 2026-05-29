@@ -13,7 +13,7 @@ import com.example.seniamaps.services.HistorialService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import java.security.Principal; // <-- Cambiado aquí también
+import java.security.Principal;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
