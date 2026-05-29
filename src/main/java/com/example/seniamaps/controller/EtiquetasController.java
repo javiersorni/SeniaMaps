@@ -26,7 +26,7 @@ public class EtiquetasController {
     @Autowired
     private ResultadoRepository resultadoRepository;
 
-    // 1. Vista principal y Filtrado por etiqueta
+    //tag filter
     @GetMapping
     public String gestionarEtiquetas(@RequestParam(required = false) String tag, Model model) {
         List<Etiqueta> etiquetasObtenidas;
@@ -44,7 +44,7 @@ public class EtiquetasController {
         return "etiquetas";
     }
 
-    // 2. Eliminar una etiqueta concreta de un resultado específico
+    //delete tag
     @Transactional // Obligatorio para operaciones de borrado personalizadas en JPA
     @PostMapping("/delete-etiqueta")
     public String eliminarEtiquetaDeFavorito(@RequestParam Long resultadoId, @RequestParam String tagName) {
@@ -52,14 +52,14 @@ public class EtiquetasController {
         return "redirect:/etiquetas";
     }
 
-    // 3. Eliminar un favorito (Resultado) y quitarle todas sus etiquetas automáticamente
+    //delete a favourite result
     @Transactional
     @PostMapping("/delete-favorito")
     public String eliminarFavoritoCompleto(@RequestParam Long resultadoId) {
-        // Requisito: Primero borramos todas las etiquetas asociadas a este idResultado
+        //delete every tag
         etiquetaRepository.deleteByResultadoIdResultado(resultadoId);
         
-        // Ahora ya podemos borrar de forma segura el favorito de su tabla sin violar claves foráneas
+        //delete the favourite
         resultadoRepository.deleteById(resultadoId);
         
         return "redirect:/etiquetas";

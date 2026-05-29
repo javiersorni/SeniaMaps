@@ -30,7 +30,7 @@ public class AuthController {
     @GetMapping("/login")
     public String login(Authentication auth) {
 
-        // Si ya está logueado → no volver al login
+        //if the user is logged
         if (auth != null && auth.isAuthenticated()
                 && !auth.getName().equals("anonymousUser")) {
             return "redirect:/home";
@@ -62,7 +62,7 @@ public class AuthController {
             return "redirect:/login?registroExitoso";
             
         } catch (DataIntegrityViolationException e) {
-            // Conseguimos el motivo exacto del fallo de base de datos
+            //error message
             String mensajeError = e.getMostSpecificCause().getMessage();
             
             if (mensajeError.contains("username")) {
@@ -73,7 +73,7 @@ public class AuthController {
                 result.rejectValue("global", "error.usuario", "Error de duplicidad en los datos.");
             }
             
-            // Volvemos a la vista del formulario para que el usuario vea el mensaje en rojo
+            //show the message
             return "registro"; 
         }
     }
