@@ -49,7 +49,7 @@ public class PlacesController {
                         @RequestParam(defaultValue = "3000") int radius,
                         @RequestParam(defaultValue = "20") int limit) {
 
-                //Evita el NullPointerException si la sesión expira
+                //Evade the ResponseStatusException
                 if (user == null) {
                         throw new ResponseStatusException(
                                         HttpStatus.UNAUTHORIZED,
@@ -76,15 +76,15 @@ public class PlacesController {
 
                 GeoapifyResponseDTO response = geoapifyService.searchPlaces(lat, lon, keyword, radius, limit);
 
-                // 1. Guardar resultados en BD
+                // Save on DB
                 resultadoService.saveResults(response.getFeatures(), busqueda);
 
-                // 2. ratings del usuario
+                // Enrich the user rating
                 resultadoService.enrichRatings(response, usuario);
 
                 favoritosService.enrichFavoritos(response, usuario);
 
-                // 3. devolver response ya enriquecido
+                // return response already enriched
                 return response;
         }
 }
