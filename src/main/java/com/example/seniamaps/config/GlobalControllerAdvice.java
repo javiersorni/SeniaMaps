@@ -13,7 +13,6 @@ public class GlobalControllerAdvice {
         if (authentication != null) {
             return authentication.getName();
         }
-
         return "";
     }
 }

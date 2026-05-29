@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.*;
 
+//Entity made for DB Result_Search
+
 @Entity
 @Table(name = "resultado_busqueda")
 @Data

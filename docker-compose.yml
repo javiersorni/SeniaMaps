@@ -21,7 +21,7 @@ services:
     build: ./backend
     container_name: seniamaps-app
     restart: always
-    ports:
+    expose:
       - "8080:8080"
     environment:
       # Modificamos la URL de conexión para que apunte al nombre del servicio "db" en lugar de "localhost"

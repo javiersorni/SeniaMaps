@@ -21,18 +21,16 @@ public class DataInitializer {
             String adminUsername = "admin";
             String adminEmail = "admin@sistema.com";
 
-            // 1. Comprobamos si el username está libre
+            //Check if username is free.
             boolean usernameExists = usuarioRepository
                     .findByUsername(adminUsername)
                     .isPresent();
 
-            // 2. Comprobamos si el email está libre en la base de datos
-            // Nota: Si no tienes existsByEmail declarado, usa findByEmail(adminEmail).isPresent()
-            // o simplemente usa la query manual para evitar fallos de compilación instantáneos:
+            // We check if email exist.
             boolean emailExists = usuarioRepository.findAll().stream()
                     .anyMatch(u -> adminEmail.equalsIgnoreCase(u.getEmail()));
 
-            // 🚀 SÓLO SE CREA SI NINGUNO DE LOS DOS DATOS ESTÁ YA EN LA BASE DE DATOS
+            // Create user only if email and username are free.
             if (!usernameExists && !emailExists) {
 
                 Usuario admin = new Usuario();

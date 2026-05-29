@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//Entity made for DB User
+
 @Entity
 @Table(name = "usuario")
 @Data
@@ -19,7 +21,7 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idUsuario") // exactamente igual que en la tabla
+    @Column(name = "idUsuario") 
     private Long idUsuario;
 
     @Column(unique = true)

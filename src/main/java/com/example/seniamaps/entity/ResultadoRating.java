@@ -3,6 +3,8 @@ package com.example.seniamaps.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+//Entity made for DB Result-Rating
+
 @Entity
 @Table(name = "resultado_rating",
        uniqueConstraints = @UniqueConstraint(columnNames = {"idUsuario", "idResultado"}))

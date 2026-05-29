@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//Entity made to control Errors.
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

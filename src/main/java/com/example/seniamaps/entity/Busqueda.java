@@ -7,6 +7,8 @@ import java.util.List;
 import jakarta.persistence.*;
 import lombok.*;
 
+//Entity made for DB Search
+
 @Entity
 @Table(name = "busqueda")
 @Getter

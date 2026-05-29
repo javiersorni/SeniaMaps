@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+//Entity made for DB Category
+
 @Entity
 @Table(name = "categoria")
 @Data

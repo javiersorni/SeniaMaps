@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class FavoritoDTO {
 
-    private Long idFavorito;   // 👈 ESTE ES EL ID REAL BD
+    private Long idFavorito;
 
     private ResultadoDTO resultado;
 }

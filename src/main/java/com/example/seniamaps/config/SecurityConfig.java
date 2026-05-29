@@ -24,11 +24,7 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    /*
-     * =====================================================
-     * AUTH MANAGER
-     * =====================================================
-     */
+        //AUTH MANAGER
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -47,26 +43,19 @@ public class SecurityConfig {
         return authBuilder.build();
     }
 
-    /*
-     * =====================================================
-     * SECURITY FILTER CHAIN
-     * =====================================================
-     */
-
+    
+     //SECURITY FILTER CHAIN
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(AbstractHttpConfigurer::disable)
 
-                /*
-                 * =============================================
-                 * AUTHORIZATION RULES
-                 * =============================================
-                 */
+                //AUTHORIZATION RULES
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // públicos
+                        // public
                         .requestMatchers(
                                 "/",
                                 "/index",
@@ -78,31 +67,27 @@ public class SecurityConfig {
                                 "/cropped-CENTRADO-NEGRO-150x150.jpg"
                         ).permitAll()
 
-                        // SOLO ADMIN
+                        // only admin
                         .requestMatchers("/admin/**")
                         .hasRole("ADMIN")
 
-                        // API solo autenticados
+                        // API for only autenticated users
                         .requestMatchers("/api/**")
                         .authenticated()
 
-                        // todo lo demás autenticado
+                        // the rest.
                         .anyRequest()
                         .authenticated()
                 )
 
-                /*
-                 * =============================================
-                 * LOGIN
-                 * =============================================
-                 */
+                //Login
                 .formLogin(form -> form
 
                         .loginPage("/login")
 
                         .loginProcessingUrl("/login")
 
-                        // 🔥 REDIRECCIÓN INTELIGENTE
+                        // Smart redirect
                         .successHandler((request, response, authentication) -> {
 
                             boolean isAdmin = authentication.getAuthorities()
@@ -122,11 +107,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                /*
-                 * =============================================
-                 * LOGOUT
-                 * =============================================
-                 */
+                //Logout
                 .logout(logout -> logout
 
                         .logoutUrl("/logout")
@@ -140,11 +121,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                /*
-                 * =============================================
-                 * HEADERS
-                 * =============================================
-                 */
+                //header
                 .headers(headers -> headers
                         .cacheControl(cache -> cache.disable())
                 );
@@ -152,12 +129,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*
-     * =====================================================
-     * PASSWORD ENCODER
-     * =====================================================
-     */
-
+    //Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

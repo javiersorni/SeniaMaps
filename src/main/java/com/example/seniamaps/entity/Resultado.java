@@ -17,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//Entity made for DB Results
+
 @Entity
 @Table(name = "resultado")
 @Data
